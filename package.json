@@ -1,0 +1,29 @@
+{
+  "name": "kahakhane",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DelTa-0/KahaKhane.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DelTa-0/KahaKhane/issues"
+  },
+  "homepage": "https://github.com/DelTa-0/KahaKhane#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.2",
+    "nodemon": "^3.1.10"
+  }
+}

@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "type": "module",
-
   "scripts": {
     "start": "nodemon index.js"
   },
@@ -21,6 +20,9 @@
   "homepage": "https://github.com/DelTa-0/KahaKhane#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cookieparser": "^0.1.0",
+    "ejs": "^3.1.10",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.2",

@@ -1,6 +1,7 @@
 const userModel = require('../models/user-model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const restaurantModel =require('../models/restaurant-model');
 
 
 module.exports.registerUser=async function(req,res) {
@@ -9,8 +10,10 @@ module.exports.registerUser=async function(req,res) {
         let user= await userModel.findOne({email:email});
         if(user){
             // make response as json formatted not string
-            return res.status(400).send("you already have an account");
+             req.flash("error_msg", "You already have an account");
+            return res.redirect("/");
         }
+        
 
         // use async await
         // use service for this business operation
@@ -27,7 +30,7 @@ module.exports.registerUser=async function(req,res) {
                     });
                     let token=jwt.sign({email:user.email,id:user._id},"secret_key");
                     res.cookie("token",token);
-                    req.flash("error_msg","user created successfully");
+                    req.flash("success_msg","user created successfully");
                 }
             })
         })
@@ -41,7 +44,7 @@ module.exports.loginUser=async function(req,res) {
     try{
         let {email,password}=req.body;
         let user=await userModel.findOne({email:email});
-        if(!user) return res.send("email  or password incorrect");
+        if(!user) return req.flash("error_msg","email or password incorrect");
         bcrypt.compare(password,user.password,function(err,result){
             if(result){
                 let token=jwt.sign({email:user.email,id:user._id},"secret_key");
@@ -49,7 +52,7 @@ module.exports.loginUser=async function(req,res) {
                 res.redirect("/index");
             }
             else{
-                return req.flash("error","email or password incorrect");
+                return req.flash("error_msg","email or password incorrect");
             }
         })
 

@@ -9,7 +9,7 @@ module.exports=async function(req,res,next) {
             req.flash("error_msg","You need to login to continue");
             return res.redirect('/');
         }
-        const decoded=jwt.verify(token,"secret_key");
+        const decoded=jwt.verify(token,process.env.JWT_KEY);
         
         const user=await userModel.findOne({email:decoded.email}).select("-password");
         

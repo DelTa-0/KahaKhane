@@ -1,13 +1,59 @@
-<%- include('./partials/header') %>
+<!-- views/home.ejs -->
+<%- include('partials/header', { title: 'Home - Foodie' }) %>
 
-    
-            <div class="w-full h-screen flex px-20">
-                <div class="w-1/2 flex items-center justify-center h-screen">
-                    <div class="w-full px-32">
-                        <h3 class="text-4xl">welcome to <span class="text-blue-400 font-semibold">KahaKhane</span></h3>
-                        
-                        
-                </div>
-            </div>
-        </div>
-            <%- include('./partials/footer') %>
+<main class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
+  <div class="max-w-2xl w-full space-y-8 text-center">
+    <h3 class="text-4xl">welcome to <span class="text-blue-400 font-semibold">KahaKhane</span></h3>
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-indigo-700">Find the Best Restaurants Near You</h1>
+
+    <form action="/search" method="GET" class="space-y-4">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <input
+          name="query"
+          type="search"
+          placeholder="Search for restaurants or dishes"
+          class="w-full border border-gray-300 rounded-lg px-5 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          required
+        />
+        <input
+          name="location"
+          type="text"
+          placeholder="Enter your location"
+          class="w-full border border-gray-300 rounded-lg px-5 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </div>
+
+      <div class="w-full sm:flex-row gap-3">
+        <div class="flex flex-col sm:flex-row gap-3">
+        <input
+          name="price"
+          type="search"
+          placeholder="enter max price"
+          class="w-full border border-gray-300 rounded-lg px-5 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          required
+        />
+      </div>
+
+        <a
+        href="/share"
+        class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition"
+      >
+        Share location
+      </a>
+        <button
+          type="submit"
+          class="w-full mt-2 sm:w-auto bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+        >
+          Search
+        </button>
+        
+      </div>
+    </form>
+
+    <div class="mt-6">
+      
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

@@ -25,9 +25,9 @@ module.exports.registerUser=async function(req,res) {
                         password:hash,
                         fullname,
                     });
-                    let token=jwt.sign({emai:user.email,id:user._id},"secret_key");
+                    let token=jwt.sign({email:user.email,id:user._id},"secret_key");
                     res.cookie("token",token);
-                    res.send("user created successfully");
+                    req.flash("error_msg","user created successfully");
                 }
             })
         })
@@ -44,12 +44,12 @@ module.exports.loginUser=async function(req,res) {
         if(!user) return res.send("email  or password incorrect");
         bcrypt.compare(password,user.password,function(err,result){
             if(result){
-                let token=jwt.sign({emai:user.email,id:user._id},"secret_key");
+                let token=jwt.sign({email:user.email,id:user._id},"secret_key");
                 res.cookie("token",token);
                 res.redirect("/index");
             }
             else{
-                return res.send("email or password incorrect");
+                return req.flash("error","email or password incorrect");
             }
         })
 

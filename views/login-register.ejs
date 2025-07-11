@@ -1,6 +1,10 @@
 <%- include('./partials/header') %>
 
-    
+<% if (typeof error_msg !== 'undefined' && error_msg.length > 0) { %>
+  <div class="bg-red-100 text-red-800 p-3 rounded mb-4">
+    <%= error_msg %>
+  </div>
+<% } %>
             <div class="w-full h-screen flex px-20">
                 <div class="w-1/2 flex items-center justify-center h-screen">
                     <div class="w-full px-32">

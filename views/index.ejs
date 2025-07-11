@@ -1,5 +1,10 @@
 <!-- views/home.ejs -->
 <%- include('partials/header', { title: 'Home - Foodie' }) %>
+<% if (typeof error_msg !== 'undefined' && error_msg.length > 0) { %>
+  <div class="bg-red-100 text-red-800 p-3 rounded mb-4">
+    <%= error_msg %>
+  </div>
+<% } %>
 
 <main class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
   <div class="max-w-2xl w-full space-y-8 text-center">

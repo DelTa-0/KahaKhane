@@ -1,19 +1,22 @@
-import express from 'express';
-import userRouter from './routes/userRouter.js';
-import cookieParser from 'cookie-parser';
-import ejs from 'ejs';
+const express = require('express');
+const ejs = require('ejs');
+require('./config/mongoose-connection.js')
+const cookieParser = require('cookie-parser');
+const userRoute = require('./routes/userRoute');
+const indexRoute = require('./routes/indexRoute');
+const adminRoute = require('./routes/adminRoute');
 const app=express();
-app.use(express.json());
-app.use(cookieParser());
-app.use(express.urlencoded({extended:true}));
 app.set('view engine','ejs');
 
-app.get('/',(req,res)=>{
-    res.send("hello working")
-})
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+app.use(cookieParser());
 
-app.use('/user',userRouter);
+
+app.use('/users',userRoute);
+app.use('/admin',adminRoute);
+app.use('/',indexRoute);
 
 app.listen(3000,()=>{
-    console.log("server running on 3000 port");
+    console.log("running on 3000");
 })

@@ -1,11 +1,22 @@
 const restaurantModel = require('../models/restaurant-model');
 
 module.exports.getRestaurants = async function (req, res) {
-  try {
-    const restaurants = await restaurantModel.find({});
-    res.json(restaurants);
+   try {
+    const perPage = 12;
+    const page = Number(req.query.page) || 1; 
+    const restaurants = await restaurantModel.find()
+      .skip((perPage * page) - perPage)  // Skip the previous pages
+      .limit(perPage);  // Limit the number of restaurants per page
+    const totalRestaurants = await restaurantModel.countDocuments();
+    const totalPages = Math.ceil(totalRestaurants / perPage);
+
+    res.render('browse', { 
+      restaurants, 
+      currentPage: page, 
+      totalPages 
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to fetch restaurants' });
+    res.status(500).send('Error fetching restaurants');
   }
 };

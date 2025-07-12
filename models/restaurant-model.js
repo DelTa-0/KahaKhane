@@ -3,14 +3,14 @@ const mongoose = require('mongoose');
 
 const restaurantSchema = new mongoose.Schema({
   restaurant_id: { type: String, required: true, unique: true },
-  name: { type: String, required: true },
-  latitude: Number,
-  longitude: Number,
+  'Restaurant Name': { type: String, required: true },
+  lat: Number,
+  lng: Number,
   menu: {
     type:Array,
 
   }, // or Array
-  location: String,
+  Location: String,
 });
 
 module.exports = mongoose.model('Restaurant', restaurantSchema);

@@ -1,10 +1,12 @@
 const express = require('express');
-const { getRestaurants } = require('../controllers/restaurantController');
+const { getRestaurants, getDetails } = require('../controllers/restaurantController');
 const { getReviews } = require('../controllers/reviewController');
 
 const router=express.Router();
 
 router.get('/search',getRestaurants);
+
+router.get('/details/:restaurant_id',getDetails);
 
 router.get('/reviews',getReviews);
 

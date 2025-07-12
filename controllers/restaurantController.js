@@ -20,3 +20,16 @@ module.exports.getRestaurants = async function (req, res) {
     res.status(500).send('Error fetching restaurants');
   }
 };
+
+module.exports.getDetails = async function (req, res) {
+   try {
+    const {id}=req.params;
+    let restaurant=await restaurantModel.findOne({id});
+    console.log(restaurant)
+    res.render('restaurant',{restaurant});
+    
+  } catch (err) {
+    console.error(err.message);
+    
+  }
+};

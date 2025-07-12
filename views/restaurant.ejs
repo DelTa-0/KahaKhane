@@ -15,12 +15,17 @@
             <p class="text-lg font-medium text-gray-900"><%= item.name %></p>
             <p class="text-sm text-orange-600 font-semibold">Rs. <%= item.price %></p>
           </div>
-          <div class="flex gap-2">
-            <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="/addtocart/<%=product._id%>">
-              add to cart
-              </a>
-            
-          </div>
+           <div class="flex justify-between items-center border-b py-3">
+    
+    <form action="/cart/add" method="POST" class="flex items-center gap-2">
+      <input type="hidden" name="restaurantId" value="<%= restaurant._id %>">
+      <input type="hidden" name="itemName" value="<%= item.name %>">
+      <input type="hidden" name="itemPrice" value="<%= item.price %>">
+      <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+        Add
+      </button>
+    </form>
+  </div>
         </li>
       <% }) %>
     </ul>

@@ -23,8 +23,9 @@ module.exports.getRestaurants = async function (req, res) {
 
 module.exports.getDetails = async function (req, res) {
    try {
-    const {id}=req.params;
-    let restaurant=await restaurantModel.findOne({id});
+    const {restaurant_id}=req.params;
+    let restaurant=await restaurantModel.findOne({_id:restaurant_id});
+    
     res.render('restaurant',{restaurant});
     
   } catch (err) {

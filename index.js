@@ -7,6 +7,7 @@ const userRoute = require('./routes/userRoute');
 const indexRoute = require('./routes/indexRoute');
 const adminRoute = require('./routes/adminRoute');
 const restaurantRoute = require('./routes/restaurantRoute.js');
+const cartRoute = require('./routes/cartRoute.js');
 const session = require('express-session');
 const flash = require('connect-flash');
 const app=express();
@@ -36,6 +37,7 @@ app.use('/users',userRoute);
 app.use('/admin',adminRoute);
 app.use('/',indexRoute);
 app.use('/restaurant',restaurantRoute);
+app.use(cartRoute);
 
 app.listen(3000,()=>{
     console.log("running on 3000");

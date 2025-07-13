@@ -19,7 +19,7 @@
     
     <form action="/cart/add" method="POST" class="flex items-center gap-2">
       <input type="hidden" name="restaurantId" value="<%= restaurant._id %>">
-      <input type="hidden" name="itemName" value="<%= item.name %>">
+      <input type="hidden" name="foodname" value="<%= item.name %>">
       <input type="hidden" name="itemPrice" value="<%= item.price %>">
       <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
         Add

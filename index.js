@@ -37,7 +37,7 @@ app.use('/users',userRoute);
 app.use('/admin',adminRoute);
 app.use('/',indexRoute);
 app.use('/restaurant',restaurantRoute);
-app.use(cartRoute);
+app.use('/cart',cartRoute);
 
 app.listen(3000,()=>{
     console.log("running on 3000");

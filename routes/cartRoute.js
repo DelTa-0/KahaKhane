@@ -107,27 +107,33 @@ router.get('/checkout', verifyJWT, async (req, res) => {
 
 router.post('/checkout', verifyJWT, async (req, res) => {
   const { instructions } = req.body;
-  const user = await userModel.findById(req.user.id);
+  const user = await userModel.findById(req.user.id).populate('cart.restaurant');
 
   if (!user || user.cart.length === 0) {
-    req.flash('error_msg', 'Cart is empty or user not found');
+    req.flash('error', 'Your cart is empty.');
     return res.redirect('/cart');
   }
 
   const order = {
-    items: [...user.cart],
-    total: user.cart.reduce((sum, item) => sum + item.food.price * item.quantity, 0),
-    payment: 'Cash on Delivery',
+    items: user.cart.map(item => ({
+      restaurant: item.restaurant._id,
+      food: item.food,
+      quantity: item.quantity,
+    })),
+    totalPrice: user.cart.reduce((acc, item) => acc + item.food.price * item.quantity, 0),
+    paymentMethod: 'Cash on Delivery',
     instructions,
-    date: new Date()
+    orderedAt: new Date(),
   };
 
   user.orders.push(order);
+  const firstRestaurantId = user.cart[0].restaurant._id; 
+
   user.cart = [];
   await user.save();
-
-  res.redirect('/review');
+  res.redirect(`/review/${firstRestaurantId}`);
 });
+
 
 
 

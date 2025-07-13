@@ -99,6 +99,37 @@ router.post('/remove/:itemId', verifyJWT, async (req, res) => {
   }
 });
 
+router.get('/checkout', verifyJWT, async (req, res) => {
+  const user = await userModel.findById(req.user.id);
+  const totalPrice = user.cart.reduce((sum, item) => sum + item.food.price * item.quantity, 0);
+  res.render('checkout', { totalPrice });
+});
+
+router.post('/checkout', verifyJWT, async (req, res) => {
+  const { instructions } = req.body;
+  const user = await userModel.findById(req.user.id);
+
+  if (!user || user.cart.length === 0) {
+    req.flash('error_msg', 'Cart is empty or user not found');
+    return res.redirect('/cart');
+  }
+
+  const order = {
+    items: [...user.cart],
+    total: user.cart.reduce((sum, item) => sum + item.food.price * item.quantity, 0),
+    payment: 'Cash on Delivery',
+    instructions,
+    date: new Date()
+  };
+
+  user.orders.push(order);
+  user.cart = [];
+  await user.save();
+
+  res.redirect('/review');
+});
+
+
 
 
 router.get('/',verifyJWT,async(req,res)=>{

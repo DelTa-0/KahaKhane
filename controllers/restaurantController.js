@@ -1,4 +1,5 @@
 const restaurantModel = require('../models/restaurant-model');
+const reviewModel = require('../models/review-model');
 
 module.exports.getRestaurants = async function (req, res) {
    try {
@@ -25,8 +26,8 @@ module.exports.getDetails = async function (req, res) {
    try {
     const {restaurant_id}=req.params;
     let restaurant=await restaurantModel.findOne({_id:restaurant_id});
-    
-    res.render('restaurant',{restaurant});
+    let reviews = await reviewModel.find({ restaurant_id });
+    res.render('restaurant',{restaurant,reviews});
     
   } catch (err) {
     console.error(err.message);

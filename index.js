@@ -8,6 +8,7 @@ const indexRoute = require('./routes/indexRoute');
 const adminRoute = require('./routes/adminRoute');
 const restaurantRoute = require('./routes/restaurantRoute.js');
 const cartRoute = require('./routes/cartRoute.js');
+const reviewRoute = require('./routes/reviewRoute.js');
 const session = require('express-session');
 const flash = require('connect-flash');
 const app=express();
@@ -38,6 +39,7 @@ app.use('/admin',adminRoute);
 app.use('/',indexRoute);
 app.use('/restaurant',restaurantRoute);
 app.use('/cart',cartRoute);
+app.use('/review',reviewRoute);
 
 app.listen(3000,()=>{
     console.log("running on 3000");

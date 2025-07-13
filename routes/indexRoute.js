@@ -1,5 +1,6 @@
 const express = require('express');
 const isLoggedin = require('../middlewares/isLoggedin');
+const verifyJWT = require('../middlewares/verifyJWT');
 
 const router=express.Router();
 
@@ -11,26 +12,17 @@ router.get('/index',isLoggedin,(req,res)=>{
     res.render('index')
 })
 
+router.get('/review', verifyJWT, (req, res) => {
+  res.render('review');
+});
 
-// router.get("/cart",isLoggedin,async function(req,res){
-//     let user=await userModel.findOne({email:req.user.email})
-//     .populate("cart");
-//     let totalbill = 0;
-//     user.cart.forEach(function(item){
-//       const itemTotal = Number(item.price) + 20 - Number(item.discount);
-//       totalbill += itemTotal;
-//     })
-    
-//     res.render("cart", {user,totalbill,title:"cart"});
-// })
-
-// router.get("/addtocart/:productid",isLoggedin,async function(req,res){
-//     let user=await userModel.findOne({email:req.user.email});
-//     user.cart.push(req.params.productid);
-//     await user.save();
-//     req.flash("success","added to cart");
-//     res.redirect("/shop");
-// })
+router.post('/review', verifyJWT, async (req, res) => {
+  const { review } = req.body;
+  // You can enhance by attaching it to an order/restaurant
+  console.log(`Review from ${req.user.email}:`, review);
+  req.flash('success_msg', 'Thanks for your review!');
+  res.redirect('/');
+});
 
 
 module.exports=router;

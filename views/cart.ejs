@@ -1,35 +1,56 @@
 <%- include('partials/header') %>
 
 <div class="container mx-auto p-6">
-    <h1 class="text-3xl font-bold mb-6">Your Cart</h1>
+  <h1 class="text-3xl font-bold mb-6">Your Cart</h1>
 
-    <% if (user.cart.length === 0) { %>
-        <p class="text-gray-600">Your cart is empty. <a href="/restaurants" class="text-blue-600 underline">Browse Restaurants</a></p>
-    <% } else { %>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <% user.cart.forEach(function(restaurant) { %>
-                <div class="bg-white p-4 shadow-md rounded-xl">
-                    <h2 class="text-xl font-semibold"><%= restaurant['Restaurant Name'] || restaurant.name %></h2>
-                    <p class="text-gray-700 mb-2"><strong>Location:</strong> <%= restaurant.Location || restaurant.location %></p>
-                    <% if (restaurant.menu && restaurant.menu.length > 0) { %>
-                        <p class="text-gray-700"><strong>Menu Highlight:</strong> <%= restaurant.menu[0] %></p>
-                    <% } else { %>
-                        <p class="text-gray-500 italic">No menu available</p>
-                    <% } %>
-                    
-                    <!-- Optional image -->
-                    <% if (restaurant.image) { %>
-                        <img src="<%= restaurant.image %>" alt="Restaurant Image" class="mt-2 rounded-md w-full h-40 object-cover">
-                    <% } %>
+  <% if (user.cart.length === 0) { %>
+    <p class="text-gray-600">
+      Your cart is empty. <a href="/restaurants" class="text-blue-600 underline">Browse Restaurants</a>
+    </p>
+  <% } else { %>
+    <% let total = 0; %>
 
-                    <!-- Remove from cart button -->
-                    <form action="/cart/remove/<%= restaurant._id %>" method="POST" class="mt-4">
-                        <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Remove</button>
-                    </form>
-                </div>
-            <% }) %>
+    <div class="space-y-6">
+      <% user.cart.forEach(item => { %>
+        <% const restaurant = item.restaurant; %>
+        <% const food = item.food; %>
+        <% const subtotal = food.price * item.quantity; %>
+        <% total += subtotal; %>
+
+        <div class="bg-white p-4 shadow rounded-lg">
+          <h2 class="text-xl font-semibold mb-2"><%= restaurant.name || restaurant["Restaurant Name"] %></h2>
+          <p class="text-gray-700">Location: <%= restaurant.location || restaurant["Location"] %></p>
+
+          <div class="mt-4 flex justify-between items-center">
+            <div>
+              <p class="text-lg font-medium"><%= food.name %></p>
+              <p class="text-gray-600">Price: $<%= food.price %></p>
+              <p class="text-gray-600">Quantity: <%= item.quantity %></p>
+              <p class="text-gray-800 font-semibold mt-1">Subtotal: $<%= subtotal.toFixed(2) %></p>
+            </div>
+
+            <form action="/cart/update/<%= item._id %>" method="POST" class="flex gap-2">
+              <input type="hidden" name="action" value="reduce">
+              <button class="px-2 py-1 bg-yellow-400 rounded text-white" type="submit">-</button>
+            </form>
+            <form action="/cart/update/<%= item._id %>" method="POST" class="flex gap-2">
+              <input type="hidden" name="action" value="add">
+              <button class="px-2 py-1 bg-green-500 rounded text-white" type="submit">+</button>
+            </form>
+
+            <form action="/cart/remove/<%= item._id %>" method="POST">
+              <button class="px-3 py-1 bg-red-500 rounded text-white hover:bg-red-600">Remove</button>
+            </form>
+          </div>
         </div>
-    <% } %>
+      <% }) %>
+    </div>
+
+    <!-- Total Price -->
+    <div class="mt-8 text-right">
+      <p class="text-2xl font-bold">Total: $<%= total.toFixed(2) %></p>
+    </div>
+  <% } %>
 </div>
 
 <%- include('partials/footer') %>

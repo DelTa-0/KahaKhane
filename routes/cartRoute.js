@@ -43,19 +43,18 @@ router.post('/add', verifyJWT, async (req, res) => {
 
 
 router.get('/',verifyJWT,async(req,res)=>{
-    const {email}=req.user;
-        try {
-        const user = await userModel.findOne({ email }).populate("cart");
+    const { id } = req.user;
 
-        if (!user) {
-            return res.status(404).send("User not found");
-        }
+  try {
+    const user = await userModel.findById(id).populate('cart.restaurant');
 
-        res.render('cart', { user });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Internal Server Error");
-    }
+    if (!user) return res.status(404).send('User not found');
+
+    res.render('cart', { user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
+  }
 
 })
 

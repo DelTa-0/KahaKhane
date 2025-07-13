@@ -10,7 +10,7 @@ router.post('/add', verifyJWT, async (req, res) => {
   const { restaurantId, foodname } = req.body;
   const { itemPrice } = req.body;
   const { id } = req.user;
-  console.log(restaurantId,foodname,itemPrice);
+  
 
   // 💡 Always validate the ID
   if (!mongoose.Types.ObjectId.isValid(restaurantId)) {
@@ -40,6 +40,65 @@ router.post('/add', verifyJWT, async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
+router.post('/update/:itemId', verifyJWT, async (req, res) => {
+  const { itemId } = req.params;
+  const { action } = req.body;
+  const { id } = req.user;
+
+  try {
+    const user = await userModel.findById(id);
+
+    const cartItem = user.cart.id(itemId);
+    if (!cartItem) {
+      return res.status(404).send('Cart item not found');
+    }
+
+    if (action === 'add') {
+      cartItem.quantity += 1;
+    } else if (action === 'reduce') {
+      cartItem.quantity -= 1;
+      if (cartItem.quantity <= 0) {
+        user.cart.id(itemId).remove(); // auto remove if quantity <= 0
+      }
+    }
+
+    await user.save();
+    res.redirect('/cart');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error updating cart');
+  }
+});
+
+
+router.post('/remove/:itemId', verifyJWT, async (req, res) => {
+  const { itemId } = req.params;
+  const { id } = req.user;
+
+  try {
+    const user = await userModel.findById(id);
+    if (!user) {
+      req.flash('error_msg', 'User not found');
+      return res.redirect('/cart');
+    }
+
+    const removed = user.cart.pull({ _id: itemId });
+    if (!removed) {
+      req.flash('error_msg', 'Item not found in cart');
+      return res.redirect('/cart');
+    }
+
+    await user.save();
+    req.flash('success_msg', 'Item removed from cart');
+    res.redirect('/cart');
+  } catch (err) {
+    console.error('Remove from cart error:', err);
+    req.flash('error_msg', 'Something went wrong');
+    res.redirect('/cart');
+  }
+});
+
 
 
 router.get('/',verifyJWT,async(req,res)=>{

@@ -2,6 +2,7 @@ const express = require('express');
 const isLoggedin = require('../middlewares/isLoggedin');
 const verifyJWT = require('../middlewares/verifyJWT');
 const userModel = require('../models/user-model');
+const reviewModel = require('../models/review-model');
 
 const router=express.Router();
 
@@ -14,22 +15,43 @@ router.get('/index',isLoggedin,(req,res)=>{
 })
 
 
-router.get('/profile',verifyJWT, async (req, res) => {
-  const userId = req.session.userId; // or req.user._id
+router.get('/profile', isLoggedin, verifyJWT, async (req, res) => {
+  const userId = req.user.id;
 
-  const user = await userModel.findById(userId);
+  if (!userId) {
+    req.flash('error', 'User not authenticated');
+    return res.redirect('/login');
+  }
 
-  // Orders must be completed ones
-  const orders = user.orders
-    .filter(o => o.status === 'completed')
-    .map(o => ({
-      ...o._doc,
-      restaurantName: o.restaurantName || 'Unknown',
-      restaurant_id: o.restaurantId // for review posting
-    }));
+  const user = await userModel.findById(userId)
+    .populate({
+      path: 'orders.items.restaurant',   
+      model: 'Restaurant',               
+      select: 'name'                     
+    })
+    .lean();
 
-  res.render('profile', { user, orders });
+  if (!user) {
+    req.flash('error', 'User not found');
+    return res.redirect('/login');
+  }
+
+  const orders = (user.orders || []).filter(order =>
+    order.items.some(item => item.status === 'completed')
+  );
+
+  // sort newest first
+  orders.sort((a, b) => new Date(b.orderedAt) - new Date(a.orderedAt));
+
+  // get reviewed restaurants
+  const reviews = await reviewModel.find({ user_id: userId }).lean();
+  const reviewedKeys = reviews.map(r => `${r.order_id}_${r.food_name}`);
+
+  res.render('profile', { user, orders, reviewedKeys });
 });
+
+
+
 
 
 router.get('/profile/update',isLoggedin,(req,res)=>{

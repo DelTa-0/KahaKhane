@@ -1,64 +1,108 @@
-<%- include('partials/header') %>
+<%- include('partials/header', { title: 'Profile - Foodie' }) %>
+<%- include('partials/_flash') %>
 
-<div class="min-h-screen bg-gray-50 py-10 px-4">
-  <div class="max-w-4xl mx-auto space-y-10">
+<body class="bg-gray-100 font-sans">
+  <div class="max-w-5xl mx-auto py-12 px-4">
+    <h1 class="text-3xl font-bold text-center mb-8 text-blue-600">
+      Welcome, <%= user.fullname %>!
+    </h1>
 
-    <!-- Profile Info -->
-    <div class="bg-white shadow rounded-xl p-6">
-      <h2 class="text-2xl font-bold text-gray-800 mb-4">Profile Information</h2>
-      <div class="flex items-center gap-6">
-        <div class="h-20 w-20 rounded-full overflow-hidden border">
-          <% if (user.picture) { %>
-            <img src="/user-picture/<%= user._id %>" alt="Profile" class="object-cover h-full w-full">
-          <% } else { %>
-            <div class="bg-gray-200 h-full w-full flex items-center justify-center text-gray-500">
-              <span class="text-xl font-bold"><%= user.fullname[0] %></span>
+    <% if (orders.length === 0) { %>
+      <p class="text-xl text-gray-600 text-center">
+        You have no completed orders yet.
+      </p>
+    <% } else { %>
+      <h2 class="text-2xl font-semibold text-gray-800 mb-6">Your Recent Orders</h2>
+
+      <% 
+        // sort by date (most recent first)
+        const sortedOrders = orders.slice().sort((a,b) => new Date(b.orderedAt) - new Date(a.orderedAt));
+        for (let orderIndex = 0; orderIndex < sortedOrders.length; orderIndex++) {
+          const order = sortedOrders[orderIndex];
+      %>
+        <div class="bg-white shadow-lg rounded-xl mb-6 p-6">
+          <!-- Overall order info -->
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-lg font-medium text-gray-700">
+                Ordered on: <span class="font-semibold"><%= new Date(order.orderedAt).toLocaleString() %></span>
+              </p>
+              <p class="text-sm text-gray-500">Total Price: ₹<%= order.totalPrice %></p>
+              <p class="text-sm text-gray-500">Payment: <%= order.paymentMethod %></p>
             </div>
-          <% } %>
-        </div>
-        <div>
-          <p class="text-lg font-semibold"><%= user.fullname %></p>
-          <p class="text-sm text-gray-600"><%= user.email %></p>
-          <p class="text-sm text-gray-600">Contact: <%= user.contact %></p>
-        </div>
-      </div>
-    </div>
+            <button
+              onclick="toggleOrderDetails(<%= orderIndex %>)"
+              class="ml-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 focus:outline-none"
+            >
+              View Order Details
+            </button>
+          </div>
 
-    <!-- Order History & Review Section -->
-    <div class="bg-white shadow rounded-xl p-6">
-      <h2 class="text-2xl font-bold text-gray-800 mb-4">Completed Orders</h2>
+          <!-- Items inside this order -->
+          <div id="orderDetails<%= orderIndex %>" class="hidden mt-6 border-t border-gray-200 pt-4">
+            <ul class="space-y-6">
+            <% order.items.forEach(item => {
+              const key = order._id + '_' + item.food.name;
+              const alreadyReviewed = reviewedKeys.includes(key);
+            %>
+              <li class="border-b border-gray-300 pb-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-800"><%= item.food.name %></h3>
+                  <p class="text-sm text-gray-600">From: <%= item.restaurant ? item.restaurant.name : 'Unknown Restaurant' %></p>
+                </div>
 
-      <% if (orders.length === 0) { %>
-        <p class="text-gray-500">You have no completed orders yet.</p>
-      <% } else { %>
-        <% orders.forEach(order => { %>
-          <div class="border-t pt-6 mt-6">
-            <h3 class="text-lg font-semibold text-indigo-700 mb-2">
-              <%= order.restaurantName %> – <%= new Date(order.orderedAt).toLocaleDateString() %>
-            </h3>
-
-            <ul class="space-y-4">
-              <% order.items.forEach(item => { %>
-                <li class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-50 p-4 rounded-md">
-                  <div>
-                    <p class="font-medium"><%= item.foodName %> × <%= item.quantity %></p>
-                    <p class="text-sm text-gray-600">Price: $<%= item.price %></p>
+                <!-- Review Section -->
+                <% if (!alreadyReviewed) { %>
+                  <div class="mt-4">
+                    <label class="flex items-center space-x-2">
+                      <input 
+                        type="checkbox" 
+                        id="reviewCheckbox<%= item._id %>" 
+                        onclick="toggleReviewForm('<%= item._id %>')" 
+                        class="text-blue-600"
+                      >
+                      <span class="text-sm text-gray-700">Would you like to review this item?</span>
+                    </label>
                   </div>
 
-                  <!-- Review Form -->
-                  <form action="/review/<%= order.restaurant_id %>/<%= item.foodName %>" method="POST" class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <input type="number" name="rating" min="1" max="5" required placeholder="⭐" class="border p-2 rounded w-20 text-sm" />
-                    <input type="text" name="review" required placeholder="Leave a review..." class="border p-2 rounded flex-1 text-sm" />
-                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm hover:bg-indigo-700">Submit</button>
+                  <!-- Review Form - Initially hidden -->
+                  <form id="reviewForm<%= item._id %>" action="/review" method="POST" class="mt-4 hidden space-y-4">
+                    <input type="hidden" name="restaurant_id" value="<%= item.restaurant ? item.restaurant._id : '' %>">
+                    <input type="hidden" name="food_name" value="<%= item.food.name %>">
+                    <input type="hidden" name="order_id" value="<%= order._id %>">
+                    <textarea name="review" placeholder="Write your review..." required class="w-full p-2 border rounded-lg"></textarea>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 w-full">Submit Review</button>
                   </form>
-                </li>
-              <% }) %>
+                <% } else { %>
+                  <p class="text-green-500 mt-2">✅ You have already reviewed this item for this order.</p>
+                <% } %>
+              </li>
+            <% }) %>
             </ul>
           </div>
-        <% }) %>
+        </div>
       <% } %>
-    </div>
+    <% } %>
   </div>
-</div>
+
+  <!-- Toggle order details visibility -->
+  <script>
+    function toggleOrderDetails(orderIndex) {
+      const el = document.getElementById('orderDetails' + orderIndex);
+      el.classList.toggle('hidden');
+    }
+
+    // Show or hide the review form based on checkbox
+    function toggleReviewForm(itemId) {
+      const checkbox = document.getElementById('reviewCheckbox' + itemId);
+      const form = document.getElementById('reviewForm' + itemId);
+      if (checkbox.checked) {
+        form.classList.remove('hidden');
+      } else {
+        form.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
 
 <%- include('partials/footer') %>

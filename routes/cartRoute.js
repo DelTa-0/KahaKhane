@@ -122,6 +122,7 @@ router.post('/checkout', verifyJWT, async (req, res) => {
     })),
     totalPrice: user.cart.reduce((acc, item) => acc + item.food.price * item.quantity, 0),
     paymentMethod: 'Cash on Delivery',
+    status:'completed',
     
     instructions,
     orderedAt: new Date(),

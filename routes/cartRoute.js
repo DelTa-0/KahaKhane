@@ -122,12 +122,15 @@ router.post('/checkout', verifyJWT, async (req, res) => {
     })),
     totalPrice: user.cart.reduce((acc, item) => acc + item.food.price * item.quantity, 0),
     paymentMethod: 'Cash on Delivery',
+    
     instructions,
     orderedAt: new Date(),
   };
 
   user.orders.push(order);
   const firstRestaurantId = user.cart[0].restaurant._id; 
+
+  console.log(order);
 
   user.cart = [];
   await user.save();

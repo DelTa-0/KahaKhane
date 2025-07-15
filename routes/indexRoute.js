@@ -1,6 +1,7 @@
 const express = require('express');
 const isLoggedin = require('../middlewares/isLoggedin');
 const verifyJWT = require('../middlewares/verifyJWT');
+const userModel = require('../models/user-model');
 
 const router=express.Router();
 
@@ -16,7 +17,7 @@ router.get('/index',isLoggedin,(req,res)=>{
 router.get('/profile',verifyJWT, async (req, res) => {
   const userId = req.session.userId; // or req.user._id
 
-  const user = await User.findById(userId);
+  const user = await userModel.findById(userId);
 
   // Orders must be completed ones
   const orders = user.orders

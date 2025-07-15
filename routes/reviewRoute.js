@@ -4,23 +4,21 @@ const reviewModel = require('../models/review-model');
 const userModel = require('../models/user-model');
 const verifyJWT = require('../middlewares/verifyJWT');
 
-// route: /review/:restaurant_id
-router.get('/:restaurant_id', verifyJWT, async (req, res) => {
-  const { restaurant_id } = req.params;
+router.post('/:restaurant_id/:food_name', async (req, res) => {
+  const { restaurant_id, food_name } = req.params;
+  const { review, rating } = req.body;
 
-  const user = await userModel.findById(req.user.id);
+  await reviewModel.create({
+    restaurant_id,
+    food_name,
+    review,
+    sentiment_score: parseFloat(rating), // or run sentiment analysis
+    user_id: req.user._id
+  });
 
-  const hasOrdered = user.orders.some(order =>
-    order.items?.some(item => item.restaurant?.toString() === restaurant_id)
-  );
-
-  if (!hasOrdered) {
-    req.flash('error', 'You can only review restaurants you have ordered from.');
-    return res.redirect('/restaurants');
-  }
-
-  res.render('review', { restaurant_id });
+  res.redirect('/profile');
 });
+
 
 
 // POST /review

@@ -131,7 +131,8 @@ router.post('/checkout', verifyJWT, async (req, res) => {
 
   user.cart = [];
   await user.save();
-  res.redirect(`/review/${firstRestaurantId}`);
+  req.flash("success_msg","order completed. You can give review from your profile.")
+  res.redirect(`/restaurant/search`);
 });
 
 

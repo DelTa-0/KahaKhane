@@ -35,12 +35,16 @@
         />
       </div>
 
-        <a
-        href="/share"
-        class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition"
-      >
-        Share location
-      </a>
+       <input type="hidden" name="lat" id="lat">
+<input type="hidden" name="lng" id="lng">
+
+<button
+  type="button"
+  id="getLocationBtn"
+  class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition"
+>
+  Use My Location
+</button>
         <button
           type="submit"
           class="w-full mt-2 sm:w-auto bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
@@ -55,6 +59,23 @@
       
     </div>
   </div>
+
+  <script>
+  document.getElementById('getLocationBtn').addEventListener('click', () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        document.getElementById('lat').value = pos.coords.latitude;
+        document.getElementById('lng').value = pos.coords.longitude;
+        alert('Location added! Now hit Search.');
+      }, err => {
+        alert('Could not get location: ' + err.message);
+      });
+    } else {
+      alert('Geolocation not supported in this browser.');
+    }
+  });
+</script>
+
 </main>
 
 <%- include('partials/footer') %>

@@ -109,15 +109,44 @@ module.exports.getAllRestaurants = async function (req, res) {
   }
 };
 
-module.exports.getDetails = async function (req, res) {
-   try {
-    const {restaurant_id}=req.params;
-    let restaurant=await restaurantModel.findOne({_id:restaurant_id});
-    let reviews = await reviewModel.find({ restaurant_id });
-    res.render('restaurant',{restaurant,reviews});
+module.exports.getDetails = async (req, res) => {
+  try {
     
+    const restaurant = await restaurantModel.findById(req.params.restaurant_id).lean();
+
+    if (!restaurant) {
+      req.flash('error', 'Restaurant not found.');
+      return res.redirect('/restaurant/browse');
+    }
+
+    const searchTerm = req.query.search ? req.query.search.toLowerCase() : '';
+
+    let menu = restaurant.menu || [];
+    if (searchTerm) {
+      const matches = menu.filter(item =>
+        item.name.toLowerCase().includes(searchTerm)
+      );
+      const nonMatches = menu.filter(item =>
+        !item.name.toLowerCase().includes(searchTerm)
+      );
+      menu = [...matches, ...nonMatches];
+    }
+
+    const reviews = await reviewModel.find({ restaurant: req.params.restaurant_id });
+
+    res.render('restaurant', {
+      restaurant: { ...restaurant, menu },
+      searchTerm,
+      reviews,
+      query
+    });
   } catch (err) {
-    console.error(err.message);
-    
+    console.error('Error in getDetails:', err);
+    req.flash('error', 'Unable to load restaurant details.');
+    res.redirect('/restaurant/browse');
   }
 };
+
+
+
+

@@ -35,9 +35,10 @@ module.exports.getRestaurants = async function (req, res) {
       if (geo) {
         latVal = geo.lat;
         lngVal = geo.lng;
+        
       }
     }
-
+    
     // Check if we have valid lat/lng
     if (latVal && lngVal) {
       // MongoDB aggregation query with $geoNear for sorting by distance
@@ -72,7 +73,9 @@ module.exports.getRestaurants = async function (req, res) {
       res.render('browse', {
         restaurants,
         currentPage: page,
-        totalPages
+        totalPages,
+        latVal,
+        lngVal
       });
     } else {
       res.status(400).send('Invalid location data');

@@ -60,21 +60,56 @@
     </div>
   </div>
 
-  <script>
-  document.getElementById('getLocationBtn').addEventListener('click', () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(pos => {
-        document.getElementById('lat').value = pos.coords.latitude;
-        document.getElementById('lng').value = pos.coords.longitude;
-        alert('Location added! Now hit Search.');
-      }, err => {
-        alert('Could not get location: ' + err.message);
-      });
-    } else {
-      alert('Geolocation not supported in this browser.');
+ <script>
+  const getLocationBtn = document.getElementById('getLocationBtn');
+  const latInput = document.getElementById('lat');
+  const lngInput = document.getElementById('lng');
+  const searchForm = document.querySelector('form');
+
+  getLocationBtn.addEventListener('click', () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      return;
     }
+
+    getLocationBtn.textContent = 'Getting location…';
+    getLocationBtn.disabled = true;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        // ✅ Got location
+        latInput.value = position.coords.latitude;
+        lngInput.value = position.coords.longitude;
+
+        alert('📍 Location detected! Searching nearby restaurants…');
+        // ✅ Auto-submit the form with coordinates
+        searchForm.submit();
+      },
+      (error) => {
+        // ❌ Error occurred
+        console.error('Geolocation error:', error);
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            alert('❌ You denied the location request.');
+            break;
+          case error.POSITION_UNAVAILABLE:
+            alert('❌ Location information is unavailable.');
+            break;
+          case error.TIMEOUT:
+            alert('❌ Location request timed out.');
+            break;
+          default:
+            alert('❌ An unknown error occurred.');
+            break;
+        }
+        getLocationBtn.textContent = 'Use My Location';
+        getLocationBtn.disabled = false;
+      }
+    );
   });
 </script>
+
+
 
 </main>
 

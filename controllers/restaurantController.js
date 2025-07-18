@@ -29,7 +29,7 @@ module.exports.getRestaurants = async function (req, res) {
     let latVal = lat && lat.trim() !== '' ? parseFloat(lat) : null;
     let lngVal = lng && lng.trim() !== '' ? parseFloat(lng) : null;
 
-    // If no lat/lng, try geocoding the location (like "baudha")
+    
     if (!latVal && !lngVal && location && location.trim() !== '') {
       const geo = await geocode(location); // Use your geocode function here
       if (geo) {
@@ -115,7 +115,7 @@ module.exports.getDetails = async (req, res) => {
     const restaurant = await restaurantModel.findById(req.params.restaurant_id).lean();
 
     if (!restaurant) {
-      req.flash('error', 'Restaurant not found.');
+      req.flash('error_msg', 'Restaurant not found.');
       return res.redirect('/restaurant/browse');
     }
 
@@ -138,11 +138,11 @@ module.exports.getDetails = async (req, res) => {
       restaurant: { ...restaurant, menu },
       searchTerm,
       reviews,
-      query
+      query: req.query.search || '',
     });
   } catch (err) {
     console.error('Error in getDetails:', err);
-    req.flash('error', 'Unable to load restaurant details.');
+    req.flash('error_msg', 'Unable to load restaurant details.');
     res.redirect('/restaurant/browse');
   }
 };

@@ -63,26 +63,7 @@
       <div id="map" style="height:500px; width:100%;" class="rounded-lg shadow-md"></div>
     </div>
 
-    <!-- Pagination -->
-   <div class="flex justify-between items-center mt-8">
-  <% if (currentPage > 1) { %>
-    <a href="?page=<%= currentPage - 1 %>&lat=<%= latVal %>&lng=<%= lngVal %>"
-       class="bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition">
-       ← Previous
-    </a>
-  <% } else { %>
-    <span class="bg-gray-300 text-gray-500 px-6 py-3 rounded-lg cursor-not-allowed">← Previous</span>
-  <% } %>
-
-  <% if (currentPage < totalPages) { %>
-    <a href="?page=<%= currentPage + 1 %>&lat=<%= latVal %>&lng=<%= lngVal %>"
-       class="bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition">
-       Next →
-    </a>
-  <% } else { %>
-    <span class="bg-gray-300 text-gray-500 px-6 py-3 rounded-lg cursor-not-allowed">Next →</span>
-  <% } %>
-</div>
+   
 
   </div>
 </div>

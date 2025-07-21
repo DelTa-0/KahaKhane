@@ -13,6 +13,8 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const app=express();
 app.set('view engine','ejs');
+app.use('/images', express.static('public/images'));
+
 
 app.use(session({
   secret: 'your_secret_key',

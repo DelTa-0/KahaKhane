@@ -25,6 +25,7 @@ const restaurantSchema = new mongoose.Schema({
       price: Number
     }
   ],
+  picture:String,
 
   address: { type: String } // renamed Location to address for clarity
 });

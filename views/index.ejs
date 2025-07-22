@@ -6,7 +6,7 @@
   <div class="w-full max-w-3xl mx-auto rounded-2xl backdrop-blur-md bg-white/30 shadow-2xl p-10 space-y-8 text-center animate__animated animate__fadeInDown">
 
     <h1 class="text-4xl md:text-5xl font-extrabold text-indigo-800 animate__animated animate__fadeInUp">
-      Discover the Best Restaurants Around You 🍽️
+      Discover the Best Restaurants Around You 
     </h1>
     <p class="text-lg text-gray-700 animate__animated animate__fadeInUp animate__delay-1s">
       Intelligent suggestions based on your location, preferences, and price.
@@ -20,7 +20,7 @@
           <input
             name="query"
             type="search"
-            placeholder="🔍 Search restaurants or dishes"
+            placeholder="Search restaurants or dishes"
             class="w-full rounded-xl px-6 py-4 border border-gray-300 bg-white/80 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-400"
             required
           />
@@ -29,7 +29,7 @@
           <input
             name="location"
             type="text"
-            placeholder="📍 Enter your city or area"
+            placeholder="Enter your city or area"
             class="w-full rounded-xl px-6 py-4 border border-gray-300 bg-white/80 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-400"
           />
         </div>
@@ -56,22 +56,19 @@
           id="getLocationBtn"
           class="bg-green-500 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-green-600 transition duration-300 w-full sm:w-auto"
         >
-          📍 Use My Location
+          Use My Location
         </button>
         <button
           type="submit"
           class="bg-indigo-600 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-indigo-700 transition duration-300 w-full sm:w-auto"
         >
-          🔍 Search
+           Search
         </button>
       </div>
     </form>
 
     <!-- Optional Illustration -->
-    <div class="mt-6 hidden md:block animate__animated animate__fadeInUp animate__delay-3s">
-      <img src="/images/food-map.svg" alt="Find Restaurants" class="w-full max-h-64 object-contain mx-auto" />
-    </div>
-  </div>
+ 
 
   <!-- JS: Location Capture -->
   <script>
@@ -82,7 +79,7 @@
 
     getLocationBtn.addEventListener('click', () => {
       if (!navigator.geolocation) {
-        alert('❌ Geolocation is not supported by your browser.');
+        alert(' Geolocation is not supported by your browser.');
         return;
       }
 
@@ -93,13 +90,13 @@
         (position) => {
           latInput.value = position.coords.latitude;
           lngInput.value = position.coords.longitude;
-          alert('📍 Location detected! Searching nearby restaurants…');
+          alert('Location detected! Searching nearby restaurants…');
           searchForm.submit();
         },
         (error) => {
           console.error('Geolocation error:', error);
-          alert('❌ Could not fetch location. Check permissions.');
-          getLocationBtn.textContent = '📍 Use My Location';
+          alert('Could not fetch location. Check permissions.');
+          getLocationBtn.textContent = ' Use My Location';
           getLocationBtn.disabled = false;
         }
       );

@@ -22,6 +22,10 @@ module.exports.getRestaurants = async function (req, res) {
     }
 
     // Filter by price
+    if(Number(price)<0){
+      req.flash("error_msg","please enter valid price.");
+      return res.redirect('/index');
+    }
     if (price && !isNaN(price)) {
       filter['menu.price'] = { $lte: parseFloat(price) };
     }
@@ -70,12 +74,15 @@ module.exports.getRestaurants = async function (req, res) {
       const totalPages = Math.ceil(totalRestaurants / perPage);
 
       // Send the response
-      res.render('browse', {
+      res.render('search', {
         restaurants,
         currentPage: page,
         totalPages,
         latVal,
-        lngVal
+        lngVal,
+        query: query || '',
+        location: location || '',
+        price: price || ''
       });
     } else {
       res.status(400).send('Invalid location data');
@@ -111,19 +118,21 @@ module.exports.getAllRestaurants = async function (req, res) {
 
 module.exports.getDetails = async (req, res) => {
   try {
-    
     const restaurant = await restaurantModel.findById(req.params.restaurant_id).lean();
-
     if (!restaurant) {
       req.flash('error_msg', 'Restaurant not found.');
       return res.redirect('/restaurant/browse');
     }
 
-    const searchTerm = req.query.search ? req.query.search.toLowerCase() : '';
+    // Get the search term passed from index page
+    const searchTermRaw = req.query.search || '';
+    const searchTerm = searchTermRaw.trim().toLowerCase();
 
     let menu = restaurant.menu || [];
+    let matches = [];
+
     if (searchTerm) {
-      const matches = menu.filter(item =>
+      matches = menu.filter(item =>
         item.name.toLowerCase().includes(searchTerm)
       );
       const nonMatches = menu.filter(item =>
@@ -138,14 +147,17 @@ module.exports.getDetails = async (req, res) => {
       restaurant: { ...restaurant, menu },
       searchTerm,
       reviews,
-      query: req.query.search || '',
+      query: searchTermRaw,
+      noMatch: searchTerm ? matches.length === 0 : false
     });
+
   } catch (err) {
     console.error('Error in getDetails:', err);
     req.flash('error_msg', 'Unable to load restaurant details.');
     res.redirect('/restaurant/browse');
   }
 };
+
 
 
 

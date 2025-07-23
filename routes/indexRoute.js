@@ -10,9 +10,19 @@ router.get('/',(req,res)=>{
     res.render('login-register',{loggedin:false});
 })
 
-router.get('/index',isLoggedin,(req,res)=>{
-    res.render('index',{user:req.user});
-})
+router.get('/index', isLoggedin, (req, res) => {
+  const { query, location, price } = req.query;
+
+  // later you might use query/location/price to fetch matching restaurants
+  // but for now let's just pass them to the view
+  res.render('index', {
+    user: req.user,
+    query: query || '',
+    location: location || '',
+    price: price || ''
+  });
+});
+
 
 
 router.get('/profile', isLoggedin, verifyJWT, async (req, res) => {

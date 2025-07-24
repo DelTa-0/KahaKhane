@@ -2,19 +2,17 @@
 <%- include('partials/_flash') %>
 
 <!-- Leaflet CSS -->
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet/dist/leaflet.css"
-/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
 <div class="min-h-screen flex gap-10 px-6 py-12 bg-gray-50">
-
   <!-- Sidebar -->
   <aside class="w-1/4 space-y-10">
     <div class="space-y-4">
       <h3 class="text-lg font-semibold text-gray-700">Sort by</h3>
       <form action="/shop" class="w-full">
-        <select class="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" name="sortby">
+        <select
+          class="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          name="sortby">
           <option value="popular">Popular</option>
           <option value="newest">Newest</option>
         </select>
@@ -32,38 +30,63 @@
 
   <!-- Main Content -->
   <div class="flex-1">
-    <!-- Product Grid -->
+    <!-- Recommendation Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
-      <% restaurants.forEach(function(restaurant, index){ %>
-        <% if (index < 12) { %>
+      <% if (recommendations && recommendations.length > 0) { %>
+        <% recommendations.forEach(function(r){ %>
           <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+            <!-- Restaurant image -->
             <div class="relative">
               <img
-  src="<%= restaurant.picture %>"
-  alt="<%= restaurant.name %> image"
-  class="w-full h-48 object-cover"
-  onerror="this.onerror=null; this.src='/images/default.jpg';"
-/>
+                src="<%= r.restaurant.picture %>"
+                alt="<%= r.restaurant.name %> image"
+                class="w-full h-48 object-cover"
+                onerror="this.onerror=null; this.src='/images/default.jpg';"
+              />
               <div class="absolute inset-0 bg-black opacity-20"></div>
             </div>
-            <!-- Updated details section with distance -->
-            <div class="p-6">
-              <span class="block text-gray-500 text-sm"><%= restaurant.address %></span>
-              <% if (restaurant.distance) { %>
-                <span class="block text-gray-500 text-sm"><%= (restaurant.distance/1000).toFixed(2) %> km away</span>
-              <% } %>
-              <div class="flex items-center justify-between mt-4">
-                <h4 class="font-semibold text-lg text-gray-800"><%= restaurant.name %></h4>
-                <a href="/restaurant/details/<%= restaurant._id %>?search=<%= query %>"
-   class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-  Order
-</a>
 
+            <!-- Restaurant details -->
+            <div class="p-6 space-y-2">
+              <h4 class="font-semibold text-lg text-gray-800"><%= r.restaurant.name %></h4>
+              <span class="block text-gray-500 text-sm"><%= r.restaurant.address %></span>
+
+              <!-- 📍 Distance -->
+              <% if (typeof r.distanceKm !== 'undefined' && r.distanceKm > 0) { %>
+                <span class="block text-gray-700 text-sm">
+                  📍 <%= r.distanceKm.toFixed(2) %> km away
+                </span>
+              <% } %>
+
+              <!-- ⭐ Sentiment stars -->
+              <% 
+                const sentiment = r.sentimentScore || 0;
+                // sentiment expected between 0 and 1
+                const stars = Math.round(sentiment * 5);
+              %>
+              <div class="flex items-center space-x-1">
+                <% for (let i = 1; i <= 5; i++) { %>
+                  <% if (i <= stars) { %>
+                    <span class="text-yellow-400 text-lg">★</span>
+                  <% } else { %>
+                    <span class="text-gray-300 text-lg">★</span>
+                  <% } %>
+                <% } %>
               </div>
+
+              <!-- Order button -->
+              <a
+                href="/restaurant/details/<%= r.restaurant._id %>"
+                class="inline-block bg-indigo-600 text-white px-4 py-2 mt-3 rounded hover:bg-indigo-700"
+              >
+                Order
+              </a>
             </div>
           </div>
-        <% } %>
-      <% }); %>
+        <% }); %>
+      <% } else { %>
+        <p class="text-gray-600 text-lg col-span-3">No recommendations found.</p>
+      <% } %>
     </div>
 
     <!-- Map -->
@@ -71,17 +94,14 @@
       <h2 class="text-2xl font-bold mb-4 text-gray-800">Map View</h2>
       <div id="map" style="height:500px; width:100%;" class="rounded-lg shadow-md"></div>
     </div>
-
-   
-
   </div>
 </div>
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-  // Pass restaurants data from server to client
-  const restaurants = <%- JSON.stringify(restaurants) %>;
+  // Pass restaurants data (only from recommendations) from server to client
+  const recommendations = <%- JSON.stringify(recommendations) %>;
 
   // Initialize map with default center (Kathmandu as fallback)
   const map = L.map('map').setView([27.7, 85.33], 13);
@@ -94,14 +114,14 @@
   const bounds = [];
 
   // Plot restaurant markers
-  restaurants.forEach(r => {
-    if (r.location && r.location.coordinates && r.location.coordinates.length === 2) {
-      const [lng, lat] = r.location.coordinates;
+  recommendations.forEach(r => {
+    if (r.restaurant.location && r.restaurant.location.coordinates && r.restaurant.location.coordinates.length === 2) {
+      const [lng, lat] = r.restaurant.location.coordinates;
       bounds.push([lat, lng]);
       const popupContent = `
-        <b>${r.name}</b><br/>
-        ${r.address ? r.address : ''}<br/>
-        ${r.distance ? (r.distance / 1000).toFixed(2) + ' km away' : ''}
+        <b>${r.restaurant.name}</b><br/>
+        ${r.restaurant.address ? r.restaurant.address : ''}<br/>
+        ${r.distanceKm ? r.distanceKm.toFixed(2) + ' km away' : ''}
       `;
       L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
     }

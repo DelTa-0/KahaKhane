@@ -16,6 +16,7 @@ app.set('view engine','ejs');
 app.use('/images', express.static('public/images'));
 
 
+
 app.use(session({
   secret: 'your_secret_key',
   resave: false,
@@ -42,6 +43,7 @@ app.use('/',indexRoute);
 app.use('/restaurant',restaurantRoute);
 app.use('/cart',cartRoute);
 app.use('/review',reviewRoute);
+
 
 app.listen(3000,()=>{
     console.log("running on 3000");

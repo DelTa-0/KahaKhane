@@ -28,9 +28,9 @@ module.exports.registerUser=async function(req,res) {
                         password:hash,
                         fullname,
                     });
-                    let token=jwt.sign({email:user.email,id:user._id},"secret_key");
-                    res.cookie("token",token);
+                    
                     req.flash("success_msg","user created successfully");
+                    return res.redirect('/');
                 }
             })
         })
@@ -45,16 +45,25 @@ module.exports.loginUser=async function(req,res) {
         let {email,password}=req.body;
         let user=await userModel.findOne({email:email});
         if(!user) return req.flash("error_msg","email or password incorrect");
+        
         bcrypt.compare(password,user.password,function(err,result){
-            if(result){
-                let token=jwt.sign({email:user.email,id:user._id},"secret_key");
-                res.cookie("token",token);
-                res.redirect("/index");
-            }
-            else{
-                return req.flash("error_msg","email or password incorrect");
-            }
+            if (err) {
+            console.error(err);
+            req.flash("error_msg", "Something went wrong");
+            return res.redirect("/");
+        }
+        if(result){
+            let token=jwt.sign({email:user.email,id:user._id},"secret_key",{expiresIn: "1h"});
+            res.cookie("token",token);
+            req.flash("success_msg","You have successfully logged in!!");
+            res.redirect("/index");
+        }
+        else{
+            return req.flash("error_msg","email or password incorrect");
+            
+        }
         })
+       
 
     }catch(err){
         console.log(err.message);

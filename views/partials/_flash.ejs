@@ -1,12 +1,12 @@
 <% if (typeof success_msg !== 'undefined' && success_msg.length > 0) { %>
   <div
     id="flash-success"
-    class="relative bg-green-100 text-green-800 p-4 pr-10 rounded mb-4 shadow transition-opacity duration-500 ease-in-out"
+    class="relative bg-blue-100 text-blue-800 p-4 pr-10 rounded mb-4 shadow transition-opacity duration-500 ease-in-out"
   >
     <%= success_msg %>
     <button
       onclick="document.getElementById('flash-success').style.display='none'"
-      class="absolute top-2 right-2 text-green-700 hover:text-green-900 font-bold text-lg leading-none focus:outline-none"
+      class="absolute top-2 right-2 text-blue-700 hover:text-blue-900 font-bold text-lg leading-none focus:outline-none"
       aria-label="Close"
     >
       &times;

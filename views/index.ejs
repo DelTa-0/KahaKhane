@@ -1,27 +1,27 @@
 <%- include('partials/header', { title: 'Home - KahaKhane' }) %>
 <%- include('partials/_flash') %>
 
-<!-- Page Background -->
-<main class="min-h-screen flex items-center justify-center bg-gradient-to-r from-indigo-100 via-blue-100 to-purple-200 px-4 py-12">
-  <div class="w-full max-w-3xl mx-auto rounded-2xl backdrop-blur-md bg-white/30 shadow-2xl p-10 space-y-8 text-center animate__animated animate__fadeInDown">
+<script src="https://unpkg.com/scrollreveal"></script>
 
-    <h1 class="text-4xl md:text-5xl font-extrabold text-indigo-800 animate__animated animate__fadeInUp">
-      Discover the Best Restaurants Around You 
+<main class="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 via-blue-50 to-orange-100 px-4 py-12">
+  <div class="landing-wrapper w-full max-w-3xl mx-auto rounded-2xl backdrop-blur-md bg-white/70 shadow-2xl p-10 space-y-8 text-center">
+
+    <h1 class="hero-title text-4xl md:text-5xl font-extrabold text-blue-800">
+      Discover the Best Restaurants Around You
     </h1>
-    <p class="text-lg text-gray-700 animate__animated animate__fadeInUp animate__delay-1s">
+
+    <p class="hero-sub text-lg text-gray-700">
       Intelligent suggestions based on your location, preferences, and price.
     </p>
 
-    <!-- Search Form -->
-    <form action="/restaurant/search" method="GET" class="space-y-6 animate__animated animate__fadeInUp animate__delay-2s">
-      <!-- Query & Location -->
+    <form action="/restaurant/recommendations" method="GET" class="hero-form space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="relative">
           <input
             name="query"
             type="search"
             placeholder="Search restaurants or dishes"
-            class="w-full rounded-xl px-6 py-4 border border-gray-300 bg-white/80 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            class="w-full rounded-xl px-6 py-4 border border-blue-300 bg-white shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-400"
             required
           />
         </div>
@@ -30,48 +30,82 @@
             name="location"
             type="text"
             placeholder="Enter your city or area"
-            class="w-full rounded-xl px-6 py-4 border border-gray-300 bg-white/80 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            class="w-full rounded-xl px-6 py-4 border border-blue-300 bg-white shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
       </div>
 
-      <!-- Price -->
       <div>
         <input
           name="price"
           type="number"
           placeholder="💰 Max price (optional)"
-          class="w-full rounded-xl px-6 py-4 border border-gray-300 bg-white/80 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          class="w-full rounded-xl px-6 py-4 border border-blue-300 bg-white shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
       </div>
 
-      <!-- Coordinates -->
       <input type="hidden" name="lat" id="lat" />
       <input type="hidden" name="lng" id="lng" />
 
-      <!-- Buttons -->
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+        <!-- Secondary action (orange) -->
         <button
           type="button"
           id="getLocationBtn"
-          class="bg-green-500 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-green-600 transition duration-300 w-full sm:w-auto"
+          class="bg-orange-500 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-orange-600 transition duration-300 w-full sm:w-auto"
         >
           Use My Location
         </button>
+        <!-- Primary action (blue) -->
         <button
           type="submit"
-          class="bg-indigo-600 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-indigo-700 transition duration-300 w-full sm:w-auto"
+          class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 w-full sm:w-auto"
         >
            Search
         </button>
       </div>
     </form>
+  </div>
 
-    <!-- Optional Illustration -->
- 
-
-  <!-- JS: Location Capture -->
+  <!-- 🚀 ScrollReveal Animation Script -->
   <script>
+    ScrollReveal().reveal('.landing-wrapper', {
+      duration: 1000,
+      origin: 'bottom',
+      distance: '40px',
+      opacity: 0,
+      easing: 'ease-out',
+      reset: false
+    });
+
+    ScrollReveal().reveal('.hero-title', {
+      duration: 1200,
+      origin: 'top',
+      distance: '30px',
+      delay: 300,
+      easing: 'ease-out',
+      opacity: 0
+    });
+
+    ScrollReveal().reveal('.hero-sub', {
+      duration: 1200,
+      origin: 'bottom',
+      distance: '30px',
+      delay: 600,
+      easing: 'ease-out',
+      opacity: 0
+    });
+
+    ScrollReveal().reveal('.hero-form', {
+      duration: 1200,
+      origin: 'bottom',
+      distance: '50px',
+      delay: 900,
+      easing: 'ease-out',
+      opacity: 0
+    });
+
+    // 📍 Geolocation script
     const getLocationBtn = document.getElementById('getLocationBtn');
     const latInput = document.getElementById('lat');
     const lngInput = document.getElementById('lng');
@@ -79,10 +113,9 @@
 
     getLocationBtn.addEventListener('click', () => {
       if (!navigator.geolocation) {
-        alert(' Geolocation is not supported by your browser.');
+        alert('Geolocation is not supported by your browser.');
         return;
       }
-
       getLocationBtn.textContent = '📡 Getting location…';
       getLocationBtn.disabled = true;
 
@@ -96,7 +129,7 @@
         (error) => {
           console.error('Geolocation error:', error);
           alert('Could not fetch location. Check permissions.');
-          getLocationBtn.textContent = ' Use My Location';
+          getLocationBtn.textContent = 'Use My Location';
           getLocationBtn.disabled = false;
         }
       );

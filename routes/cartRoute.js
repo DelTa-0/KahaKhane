@@ -33,7 +33,7 @@ router.post('/add', verifyJWT, async (req, res) => {
         },
       },
     });
-
+    req.flash("success_msg","item added to cart");
     res.redirect('/cart');
   } catch (err) {
     console.error(err);
@@ -131,7 +131,7 @@ router.post('/checkout', verifyJWT, async (req, res) => {
   user.orders.push(order);
   const firstRestaurantId = user.cart[0].restaurant._id; 
 
-  console.log(order);
+ 
 
   user.cart = [];
   await user.save();

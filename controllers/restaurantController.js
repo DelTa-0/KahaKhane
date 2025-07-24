@@ -1,9 +1,10 @@
 const restaurantModel = require('../models/restaurant-model');
 const reviewModel = require('../models/review-model');
+const userModel = require('../models/user-model');
+const { buildRecommendations } = require('../algorithm/recommender');  // Import the recommender
 
 const geocode = require('../utils/geocode'); 
 
- 
 
 module.exports.getRestaurants = async function (req, res) {
   try {
@@ -162,3 +163,52 @@ module.exports.getDetails = async (req, res) => {
 
 
 
+module.exports.getRecommendation=async (req, res) => {
+  try {
+    const { query, location, price, lat, lng } = req.query;
+
+    // Fetch all restaurants from DB
+    const allRestaurants = await restaurantModel.find().lean();
+
+    // Fetch all reviews (for sentiment)
+    const allReviews = await reviewModel.find().lean();
+
+    // Build a fake user object from input
+    const user = {
+      location: lat && lng ? { coordinates: [parseFloat(lng), parseFloat(lat)] } : null,
+      orders: [] // if you have order history, include it
+    };
+
+    // Use recommender
+    const recommendations = buildRecommendations({
+      restaurants: allRestaurants,
+      user,
+      reviews: allReviews
+    });
+
+    // Apply filters (budget & query)
+    let filtered = recommendations;
+    if (query) {
+      filtered = filtered.filter(r =>
+        (r.restaurant.name.toLowerCase().includes(query.toLowerCase()) ||
+         (r.restaurant.menu || []).some(item => item.name.toLowerCase().includes(query.toLowerCase())))
+      );
+    }
+    if (price) {
+      filtered = filtered.filter(r =>
+        (r.restaurant.menu || []).some(item => item.price <= price)
+      );
+    }
+
+    // Take top 10
+    const top10 = filtered.slice(0, 10);
+
+    res.render('search', {
+      recommendations: top10,
+      query
+    });
+  } catch (err) {
+    console.error('Search error:', err);
+    res.status(500).send('Something went wrong');
+  }
+};

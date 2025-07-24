@@ -29,7 +29,7 @@ router.get('/profile', isLoggedin, verifyJWT, async (req, res) => {
   const userId = req.user.id;
 
   if (!userId) {
-    req.flash('error', 'User not authenticated');
+    req.flash('error_msg', 'User not authenticated');
     return res.redirect('/login');
   }
 
@@ -42,7 +42,7 @@ router.get('/profile', isLoggedin, verifyJWT, async (req, res) => {
     .lean();
 
   if (!user) {
-    req.flash('error', 'User not found');
+    req.flash('error_msg', 'User not found');
     return res.redirect('/login');
   }
 
@@ -59,14 +59,6 @@ router.get('/profile', isLoggedin, verifyJWT, async (req, res) => {
 
   res.render('profile', { user, orders, reviewedKeys });
 });
-
-
-
-
-
-router.get('/profile/update',isLoggedin,(req,res)=>{
-    res.render('update-profile')
-})
 
 
 module.exports=router;

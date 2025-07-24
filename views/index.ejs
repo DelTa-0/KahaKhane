@@ -66,6 +66,12 @@
       </div>
     </form>
   </div>
+  <script>
+navigator.geolocation.getCurrentPosition(pos => {
+  document.getElementById('latInput').value = pos.coords.latitude;
+  document.getElementById('lngInput').value = pos.coords.longitude;
+});
+</script>
 
   <!-- 🚀 ScrollReveal Animation Script -->
   <script>

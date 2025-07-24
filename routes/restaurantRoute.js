@@ -15,7 +15,7 @@ router.get('/browse',getAllRestaurants);
 
 router.get('/reviews',getReviews);
 
-router.get('/recommendations',verifyJWT,getRecommendation);
+router.get('/recommendations',verifyJWT,getRestaurants);
 
 
 module.exports=router;

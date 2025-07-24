@@ -1,15 +1,19 @@
 const fs = require('fs');
 
 // Load the trained model parameters from the JSON file
-const model = JSON.parse(fs.readFileSync('./algorithm/model_params.json', 'utf8'));
+const model = JSON.parse(fs.readFileSync('model_params.json', 'utf8'));
 
 // Tokenize helper function
 function tokenize(text) {
+  if (typeof text !== 'string') {
+    console.warn('⚠️ tokenize() expected a string but got:', text);
+    return [];
+  }
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, ' ')  // Remove non-alphanumeric characters
-    .split(/\s+/)  // Split by spaces
-    .filter(Boolean);  // Remove empty strings
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
 }
 
 // Naive Bayes Sentiment Analysis Function

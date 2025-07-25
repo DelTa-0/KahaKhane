@@ -1,4 +1,4 @@
-<%- include('partials/header', { title: 'Browse - KahaKhane' }) %>
+<%- include('partials/header') %>
 <%- include('partials/_flash') %>
 
 <!-- Leaflet CSS -->
@@ -76,7 +76,7 @@
 
               <!-- Order button -->
               <a
-                href="/restaurant/details/<%= r.restaurant._id %>"
+                href="/restaurant/details/<%= r.restaurant._id %>?search=<%= query %>"
                 class="inline-block bg-indigo-600 text-white px-4 py-2 mt-3 rounded hover:bg-indigo-700"
               >
                 Order

@@ -3,7 +3,7 @@
 
 <!-- ✅ Search Form -->
 <div class="flex justify-center mb-4">
-  <form action="/restaurant/details/<%= restaurant._id %>" method="GET" 
+  <form action="/restaurant/details/<%= restaurant._id %>" method="GET"
         class="flex items-center gap-2 w-full sm:w-1/2">
     <input 
       type="text" 
@@ -39,9 +39,9 @@
   <% } %>
 
   <div class="bg-white rounded-lg shadow overflow-hidden">
-    <ul class="divide-y divide-gray-200">
+    <ul class="flex flex-col divide-y divide-gray-200">
       <% restaurant.menu.forEach(item => { %>
-        <li 
+        <li id="menu-item-<%= item._id %>"
           class="px-4 py-4 sm:px-6 flex justify-between items-center
           <% if (searchTerm && item.name.toLowerCase().includes(searchTerm.toLowerCase())) { %>
             bg-blue-100
@@ -67,5 +67,18 @@
     </ul>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const firstMatchId = "<%= firstMatch ? firstMatch._id : '' %>";
+    if (firstMatchId) {
+      const el = document.getElementById(`menu-item-${firstMatchId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("ring-2", "ring-yellow-400"); // add visible highlight
+      }
+    }
+  });
+</script>
 
 <%- include('partials/footer') %>

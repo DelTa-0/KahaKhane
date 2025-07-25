@@ -177,10 +177,10 @@ function buildRecommendations({ restaurants, user, reviews }) {
     s.distancePenalty = maxDist > 0 ? s.distanceKm / maxDist : 0;
   });
 
-  const α = 0.4; // content
-  const β = 0.3; // popularity
-  const γ = 0.2; // sentiment
-  const δ = 0.1; // distance penalty
+  const α = 0.2; // content
+  const β = 0.2; // popularity
+  const γ = 0.3; // sentiment
+  const δ = 0.3; // distance penalty
   scored.forEach(s => {
     s.finalScore =
       α * s.contentScore +

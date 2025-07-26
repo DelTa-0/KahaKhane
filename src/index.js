@@ -11,6 +11,7 @@ const { APP_CONFIG } = require('./config/app.config.js');
 const appendUserToRequest = require('./middlewares/append-user.middleware.js');
 const app = express();
 app.set('view engine','ejs');
+app.use(express.static('public'));
 app.use('/images', express.static('public/images'));
 
 const secret = APP_CONFIG.SESSION_SECRET;

@@ -30,7 +30,7 @@ const SAVE_DIR = path.join(__dirname, '../public/images/restaurants');
         }
 
         const fileExt = path.extname(imgUrl.split('?')[0]) || '.jpg';
-        const fileName = `${r.restaurant_id}${fileExt}`;
+        const fileName = `${r.restaurantId}${fileExt}`;
         const filePath = path.join(SAVE_DIR, fileName);
 
         // skip if already downloaded

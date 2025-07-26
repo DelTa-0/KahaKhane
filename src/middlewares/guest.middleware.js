@@ -6,7 +6,7 @@ module.exports = function (req, res, next) {
       return;
     }
     
-    req.cookies.token = undefined;
+    res.clearCookie('token');
     res.redirect("/");
   } catch (err) {
     console.log(err.message);

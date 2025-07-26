@@ -1,11 +1,12 @@
 const express = require('express');
-const verifyJWT = require('../middlewares/verifyJWT');
+const isLoggedin = require('../middlewares/auth.middleware.js');
+
 const router = express.Router();
 const userModel = require('../models/user.model');
 const restaurantModel = require('../models/restaurant.model');
 const mongoose = require('mongoose');
 
-router.post('/add', verifyJWT, async (req, res) => {
+router.post('/add', isLoggedin, async (req, res) => {
   const { restaurantId, foodname } = req.body;
   const { itemPrice } = req.body;
   const { id } = req.user;
@@ -40,7 +41,7 @@ router.post('/add', verifyJWT, async (req, res) => {
   }
 });
 
-router.post('/update/:itemId', verifyJWT, async (req, res) => {
+router.post('/update/:itemId', isLoggedin, async (req, res) => {
   const { itemId } = req.params;
   const { action } = req.body;
   const { id } = req.user;
@@ -71,7 +72,7 @@ router.post('/update/:itemId', verifyJWT, async (req, res) => {
 });
 
 
-router.post('/remove/:itemId', verifyJWT, async (req, res) => {
+router.post('/remove/:itemId', isLoggedin, async (req, res) => {
   const { itemId } = req.params;
   const { id } = req.user;
 
@@ -98,13 +99,13 @@ router.post('/remove/:itemId', verifyJWT, async (req, res) => {
   }
 });
 
-router.get('/checkout', verifyJWT, async (req, res) => {
+router.get('/checkout', isLoggedin, async (req, res) => {
   const user = await userModel.findById(req.user.id);
   const totalPrice = user.cart.reduce((sum, item) => sum + item.food.price * item.quantity, 0);
   res.render('checkout', { totalPrice });
 });
 
-router.post('/checkout', verifyJWT, async (req, res) => {
+router.post('/checkout', isLoggedin, async (req, res) => {
   const { instructions } = req.body;
   const user = await userModel.findById(req.user.id).populate('cart.restaurant');
 
@@ -142,7 +143,7 @@ router.post('/checkout', verifyJWT, async (req, res) => {
 
 
 
-router.get('/',verifyJWT,async(req,res)=>{
+router.get('/',isLoggedin,async(req,res)=>{
     const { id } = req.user;
 
   try {

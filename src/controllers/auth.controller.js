@@ -3,6 +3,24 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const restaurantModel = require("../models/restaurant.model");
 
+module.exports.getLoginPage = function (req,res){
+  res.render('login-register');
+}
+
+/**
+ * 
+ */
+module.exports.getIndexPage = function (req, res) {
+ const { query, location, price } = req.query;
+
+  res.render('index', {
+    user: req.user,
+    query: query || '',
+    location: location || '',
+    price: price || ''
+  });
+}
+
 module.exports.registerUser = async function (req, res) {
   try {
     let { email, password, fullname } = req.body;
@@ -75,10 +93,8 @@ module.exports.loginUser = async function (req, res) {
       }
     });
   } catch (err) {
-    console.log(err, "Comming here");
     req.flash("error_msg", "Please enter email and password!");
     res.redirect("/login");
-    console.log(err.message);
   }
 };
 
@@ -86,3 +102,5 @@ module.exports.logout = function (req, res) {
   res.cookie("token", "");
   res.redirect("/login");
 };
+
+

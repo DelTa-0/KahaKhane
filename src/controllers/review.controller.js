@@ -1,5 +1,7 @@
 
+const { tokenize, predict_naive_bayes } = require('../../algorithm/naiveBayes');
 const reviewModel = require('../models/review.model');
+const userModel = require('../models/user.model');
 
 module.exports.getReviews=async function (req,res){
     try {
@@ -14,27 +16,27 @@ module.exports.getReviews=async function (req,res){
 module.exports.addReview = async function (req,res){
   try {
     const userId = req.user.id || req.user._id;
-    const { restaurant_id, food_name, review, order_id } = req.body;
+    const { restaurantId, foodName, review, orderId } = req.body;
 
-    if (!restaurant_id || !food_name || !review || !order_id) {
+    if (!restaurantId || !foodName || !review || !orderId) {
       req.flash('error_msg', 'Missing required fields.');
-      return res.redirect('/profile');
+      return res.redirect('/users/profile');
     }
 
     // ✅ Verify user and order
     const user = await userModel.findById(userId).lean();
     if (!user) {
       req.flash('error_msg', 'User not found.');
-      return res.redirect('/profile');
+      return res.redirect('/users/profile');
     }
 
     let hasOrdered = false;
     (user.orders || []).forEach(order => {
-      if (String(order._id) === String(order_id)) {
+      if (String(order._id) === String(orderId)) {
         order.items.forEach(item => {
           if (
-            String(item.restaurant) === String(restaurant_id) &&
-            item.food.name === food_name &&
+            String(item.restaurant) === String(restaurantId) &&
+            item.food.name === foodName &&
             item.status === 'completed'
           ) {
             hasOrdered = true;
@@ -45,18 +47,19 @@ module.exports.addReview = async function (req,res){
 
     if (!hasOrdered) {
       req.flash('error_msg', 'You cannot review an item you have not ordered.');
-      return res.redirect('/profile');
+      return res.redirect('/users/profile');
     }
 
     // ✅ Check if review already exists
     const existingReview = await reviewModel.findOne({
-      user_id: userId,
-      order_id,
-      food_name
+      userId: userId,
+      orderId: orderId,
+      foodName: foodName
     });
+
     if (existingReview) {
       req.flash('error_msg', 'You have already reviewed this item for this order.');
-      return res.redirect('/profile');
+      return res.redirect('/users/profile');
     }
 
     // ✅ Predict sentiment using Naive Bayes
@@ -65,19 +68,19 @@ module.exports.addReview = async function (req,res){
 
     // ✅ Create review with sentiment_score
     await reviewModel.create({
-      user_id: userId,
-      restaurant_id,
-      order_id,
-      food_name,
+      userId: userId,
+      restaurantId: restaurantId,
+      orderId: orderId,
+      foodName: foodName,
       review,
-      sentiment_score: sentimentScore
+      sentimentScore: sentimentScore
     });
 
-    req.flash('success_msg', `Review for ${food_name} submitted! Sentiment: ${sentimentScore === 1 ? 'Positive' : 'Negative'}`);
-    res.redirect('/profile');
+    req.flash('success_msg', `Review for ${foodName} submitted! Sentiment: ${sentimentScore === 1 ? 'Positive' : 'Negative'}`);
+    res.redirect('/users/profile');
   } catch (err) {
     console.error(err);
     req.flash('error_msg', 'Could not submit review.');
-    res.redirect('/profile');
+    res.redirect('/users/profile');
   }
 }

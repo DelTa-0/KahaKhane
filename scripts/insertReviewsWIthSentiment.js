@@ -47,10 +47,10 @@ async function main() {
         restaurantIndex++;
 
         const doc = {
-          user_id: null, // you can leave null if you don't have user
-          restaurant_id: selectedRestaurant._id,
-          order_id: null,
-          food_name: '', // optional
+          userId: null, // you can leave null if you don't have user
+          restaurantId: selectedRestaurant._id,
+          orderId: null,
+          foodName: '', // optional
           review: reviewText,
           sentiment_score: sentimentScore,
           createdAt: new Date(),

@@ -2,24 +2,23 @@ const express = require('express');
 const { addReview } = require('../controllers/review.controller')
 const router = express.Router();
 const reviewModel = require('../models/review.model');
-const verifyJWT = require('../middlewares/verifyJWT');
 
 
-router.post('/:restaurant_id/:food_name', async (req, res) => {
-  const { restaurant_id, food_name } = req.params;
+router.post('/:restaurantId/:foodName', async (req, res) => {
+  const { restaurantId, foodName } = req.params;
   const { review, rating } = req.body;
 
   await reviewModel.create({
-    restaurant_id,
-    food_name,
+    restaurantId,
+    foodName,
     review,
     sentiment_score: parseFloat(rating), // or run sentiment analysis
-    user_id: req.user._id
+    userId: req.user._id
   });
 
-  res.redirect('/profile');
+  res.redirect('/users/profile');
 });
 
-router.post('/',verifyJWT, addReview);
+router.post('/', addReview);
 
 module.exports = router;

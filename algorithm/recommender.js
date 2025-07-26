@@ -100,7 +100,7 @@ function buildRecommendations({ restaurants, user, reviews }) {
   let profileVector = new Array(vectors[0]?.length || 0).fill(0);
   const orderedIndexes = restaurants
     .map((r, idx) =>
-      orderedRestaurantIds.has(String(r.restaurant_id)) ? idx : -1
+      orderedRestaurantIds.has(String(r.restaurantId)) ? idx : -1
     )
     .filter(idx => idx >= 0);
 
@@ -120,7 +120,7 @@ function buildRecommendations({ restaurants, user, reviews }) {
   const sentimentMap = {};
   (reviews || []).forEach(rv => {
     // Convert ObjectIds to string for matching
-    const restIdStr = rv.restaurant_id ? String(rv.restaurant_id) : null;
+    const restIdStr = rv.restaurantId ? String(rv.restaurantId) : null;
     const reviewText = rv.review || rv.reviewText || rv.text || '';
 
     if (!restIdStr || !reviewText) return; // skip if invalid
@@ -177,10 +177,10 @@ function buildRecommendations({ restaurants, user, reviews }) {
     s.distancePenalty = maxDist > 0 ? s.distanceKm / maxDist : 0;
   });
 
-  const α = 0.2; // content
-  const β = 0.2; // popularity
+  const α = 0.1; // content
+  const β = 0.1; // popularity
   const γ = 0.3; // sentiment
-  const δ = 0.3; // distance penalty
+  const δ = 0.5; // distance penalty
   scored.forEach(s => {
     s.finalScore =
       α * s.contentScore +

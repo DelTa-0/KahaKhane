@@ -67,9 +67,9 @@
 
                   <!-- Review Form - Initially hidden -->
                   <form id="reviewForm<%= item._id %>" action="/review" method="POST" class="mt-4 hidden space-y-4">
-                    <input type="hidden" name="restaurant_id" value="<%= item.restaurant ? item.restaurant._id : '' %>">
-                    <input type="hidden" name="food_name" value="<%= item.food.name %>">
-                    <input type="hidden" name="order_id" value="<%= order._id %>">
+                    <input type="hidden" name="restaurantId" value="<%= item.restaurant ? item.restaurant._id : '' %>">
+                    <input type="hidden" name="foodName" value="<%= item.food.name %>">
+                    <input type="hidden" name="orderId" value="<%= order._id %>">
                     <textarea name="review" placeholder="Write your review..." required class="w-full p-2 border rounded-lg"></textarea>
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 w-full">Submit Review</button>
                   </form>

@@ -1,9 +1,8 @@
 const express = require('express');
-
 const router=express.Router();
 
 router.get('/',(req,res)=>{
-    res.send("this is admin route");
+    res.send("Feature comming soon!");
 })
 
-module.exports=router;
+module.exports = router;

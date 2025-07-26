@@ -1,14 +1,16 @@
 const express = require('express');
 const ejs = require('ejs');
 require('dotenv').config();
-require('./config/mongoose-connection.js')
+require('./config/db.config.js')
+
 const cookieParser = require('cookie-parser');
-const userRoute = require('./routes/userRoute');
-const indexRoute = require('./routes/indexRoute');
-const adminRoute = require('./routes/adminRoute');
-const restaurantRoute = require('./routes/restaurantRoute.js');
-const cartRoute = require('./routes/cartRoute.js');
-const reviewRoute = require('./routes/reviewRoute.js');
+const userRoute = require('./routes/user.route');
+const indexRoute = require('./routes/index');
+const adminRoute = require('./routes/admin.route');
+const restaurantRoute = require('./routes/restaurant.route');
+const cartRoute = require('./routes/cart.route');
+const reviewRoute = require('./routes/review.route');
+
 const session = require('express-session');
 const flash = require('connect-flash');
 const app=express();

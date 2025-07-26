@@ -1,7 +1,7 @@
-const userModel = require('../models/user-model');
+const userModel = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const restaurantModel =require('../models/restaurant-model');
+const restaurantModel =require('../models/restaurant.model');
 
 
 module.exports.registerUser=async function(req,res) {

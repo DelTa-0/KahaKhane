@@ -1,38 +1,17 @@
-const express = require('express');
-const router = express.Router();
-const reviewModel = require('../models/review-model');
-const userModel = require('../models/user-model');
-const verifyJWT = require('../middlewares/verifyJWT');
-const isLoggedin = require('../middlewares/isLoggedin');
-const axios = require('axios');
-const restaurantModel = require('../models/restaurant-model');
 
-const { predict_naive_bayes, tokenize } = require('../algorithm/naiveBayes'); // Import your Naive Bayes model
+const reviewModel = require('../models/review.model');
 
+module.exports.getReviews=async function (req,res){
+    try {
+        const review = await reviewModel.find({});
+        res.json(review);
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch reviews' });
+      }
+    }
 
-router.post('/:restaurant_id/:food_name', async (req, res) => {
-  const { restaurant_id, food_name } = req.params;
-  const { review, rating } = req.body;
-
-  await reviewModel.create({
-    restaurant_id,
-    food_name,
-    review,
-    sentiment_score: parseFloat(rating), // or run sentiment analysis
-    user_id: req.user._id
-  });
-
-  res.redirect('/profile');
-});
-
-
-
-
-
-
-// Make sure path is correct
-
-router.post('/',verifyJWT, async (req, res) => {
+module.exports.addReview = async function (req,res){
   try {
     const userId = req.user.id || req.user._id;
     const { restaurant_id, food_name, review, order_id } = req.body;
@@ -101,11 +80,4 @@ router.post('/',verifyJWT, async (req, res) => {
     req.flash('error_msg', 'Could not submit review.');
     res.redirect('/profile');
   }
-});
-
-
-
-
-
-
-module.exports = router;
+}

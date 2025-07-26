@@ -5,7 +5,6 @@ const restaurantSchema = new mongoose.Schema({
   restaurant_id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
 
-  // GeoJSON location field
   location: {
     type: {
       type: String,
@@ -14,7 +13,7 @@ const restaurantSchema = new mongoose.Schema({
       required: true
     },
     coordinates: {
-      type: [Number], // [longitude, latitude]
+      type: [Number],
       required: true
     }
   },
@@ -25,15 +24,14 @@ const restaurantSchema = new mongoose.Schema({
       price: Number
     }
   ],
-  picture:String,
-
-  address: { type: String } // renamed Location to address for clarity
+  picture: {
+    type: String,
+    required: true
+  },
+  address: { type: String }
 });
 
 // Important: add geospatial index
 restaurantSchema.index({ location: '2dsphere' });
-
-
-
 
 module.exports = mongoose.model('Restaurant', restaurantSchema);

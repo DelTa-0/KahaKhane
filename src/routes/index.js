@@ -1,8 +1,8 @@
 const express = require('express');
-const isLoggedin = require('../middlewares/isLoggedin');
+const isLoggedin = require('../middlewares/auth.middleware.js');
 const verifyJWT = require('../middlewares/verifyJWT');
-const userModel = require('../models/user-model');
-const reviewModel = require('../models/review-model');
+const userModel = require('../models/user.model');
+const reviewModel = require('../models/review.model.js');
 
 const router=express.Router();
 

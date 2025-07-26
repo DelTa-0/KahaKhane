@@ -1,9 +1,8 @@
 const express = require('express');
 const verifyJWT = require('../middlewares/verifyJWT');
 const router = express.Router();
-const cartController = require('../controllers/cartController');
-const userModel = require('../models/user-model');
-const restaurantModel = require('../models/restaurant-model');
+const userModel = require('../models/user.model');
+const restaurantModel = require('../models/restaurant.model');
 const mongoose = require('mongoose');
 
 router.post('/add', verifyJWT, async (req, res) => {

@@ -1,12 +1,13 @@
-const restaurantModel = require('../models/restaurant-model');
-const reviewModel = require('../models/review-model');
-const userModel = require('../models/user-model');
-const { buildRecommendations } = require('../algorithm/recommender');  // Import the recommender
+const restaurantModel = require('../models/restaurant.model');
+const reviewModel = require('../models/review.model');
+const userModel = require('../models/user.model');
+const { buildRecommendations } = require('../../algorithm/recommender');  // Import the recommender
 
 const geocode = require('../utils/geocode'); 
+
 module.exports.getRestaurants = async (req, res) => {
   try {
-    const {
+    let {
       query, // food keyword
       price,
       lat,
@@ -16,25 +17,21 @@ module.exports.getRestaurants = async (req, res) => {
       location
     } = req.query;
 
-    // ✅ Build search term consistently
     const searchTermRaw = query || '';
     const searchTerm = searchTermRaw.trim().toLowerCase();
 
-    // ✅ Handle location
     let userLocation = null;
-    if (lat && lng) {
-      userLocation = { coordinates: [parseFloat(lng), parseFloat(lat)] };
-    } else if (location && location.trim() !== '') {
-      try {
-        const geo = await geocode(location.trim());
-        if (geo && geo.coordinates) {
-          userLocation = { coordinates: geo.coordinates };
-        }
-      } catch (err) {
-        console.warn('Geocode failed:', err.message);
-      }
-    }
-
+  if (lat && lng && lat.trim() !== '' && lng.trim() !== '') {
+  userLocation = { coordinates: [parseFloat(lng), parseFloat(lat)] };
+  } else if (location && location.trim() !== '') {
+  const geo = await geocode(location.trim());
+  if (geo && geo.coordinates) {
+    userLocation = { coordinates: geo.coordinates };
+  }
+ lat = geo.coordinates[1]; // latitude
+ lng = geo.coordinates[0]; // longitude
+ 
+  }
     const allRestaurants = await restaurantModel.find().lean();
     const allReviews = await reviewModel.find().lean();
 
@@ -49,7 +46,6 @@ module.exports.getRestaurants = async (req, res) => {
       reviews: allReviews
     });
 
-    // ✅ Apply food keyword filter
     if (searchTerm) {
       recommendations = recommendations.filter(r =>
         (r.restaurant.name?.toLowerCase().includes(searchTerm)) ||
@@ -80,10 +76,14 @@ module.exports.getRestaurants = async (req, res) => {
 
     const top10 = recommendations.slice(0, 10);
 
+    console.log('lat, lng:', lat, lng);
+
     res.render('recommendations', {
       recommendations: top10,
-      query: searchTermRaw, // ✅ pass keyword for restaurant page
-      searchTerm,           // ✅ also pass lowercase version if needed
+      query: searchTermRaw,
+      searchTerm,
+      lat,
+      lng,
       noMatch: searchTerm ? top10.length === 0 : false
     });
   } catch (err) {
@@ -91,11 +91,6 @@ module.exports.getRestaurants = async (req, res) => {
     res.status(500).send('Something went wrong');
   }
 };
-
-
-
-
-
 
 module.exports.getAllRestaurants = async function (req, res) {
    try {

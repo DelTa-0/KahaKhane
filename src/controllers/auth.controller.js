@@ -1,10 +1,9 @@
 const userModel = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const restaurantModel = require("../models/restaurant.model");
 
 module.exports.getLoginPage = function (req,res){
-  res.render('login-register');
+  res.render('login-register',{loggedin:false});
 }
 
 /**
@@ -88,10 +87,11 @@ module.exports.loginUser = async function (req, res) {
         req.flash("success_msg", "You have successfully logged in!!");
         res.redirect("/");
       } else {
-        req.flash("error_msg", "email or password incorrect");
+        req.flash("error_msg", "Email or password incorrect");
         res.redirect("/login");
       }
     });
+
   } catch (err) {
     req.flash("error_msg", "Please enter email and password!");
     res.redirect("/login");
@@ -99,7 +99,7 @@ module.exports.loginUser = async function (req, res) {
 };
 
 module.exports.logout = function (req, res) {
-  res.cookie("token", "");
+  // res.cookie("token", "");
   res.redirect("/login");
 };
 

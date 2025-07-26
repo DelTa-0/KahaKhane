@@ -26,7 +26,7 @@ const orderItemSchema = new mongoose.Schema({
       ORDER_STATUS.COMPLETED,
       ORDER_STATUS.CANCELLED,
     ],
-    default: ORDER_STATUS.PENDING,
+    default: ORDER_STATUS.COMPLETED,
   },
 });
 
@@ -39,9 +39,19 @@ const orderSchema = new mongoose.Schema({
 });
 
 const userSchema = mongoose.Schema({
-  fullname: String,
-  email: String,
-  password: String,
+  fullname: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+
   cart: [orderItemSchema],
   orders: [orderSchema],
   contact: Number,

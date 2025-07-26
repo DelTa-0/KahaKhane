@@ -6,12 +6,13 @@ const adminRoute = require('./admin.route');
 const restaurantRoute = require('./restaurant.route');
 const cartRoute = require('./cart.route');
 const reviewRoute = require('./review.route');
+const isLoggedin = require('../middlewares/auth.middleware.js');
 
-router.use('/users', userRoute);
-router.use('/admin', adminRoute);
-router.use('/restaurant', restaurantRoute);
-router.use('/cart', cartRoute);
-router.use('/review', reviewRoute);
+router.use('/users',isLoggedin, userRoute);
+router.use('/admin',isLoggedin, adminRoute);
+router.use('/restaurant',isLoggedin, restaurantRoute);
+router.use('/cart',isLoggedin, cartRoute);
+router.use('/review',isLoggedin, reviewRoute);
 router.use('/', authRoute);
 
 module.exports = router;

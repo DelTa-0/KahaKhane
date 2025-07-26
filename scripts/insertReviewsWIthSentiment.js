@@ -3,11 +3,10 @@ const fs = require('fs');
 const csv = require('csv-parser');
 
 // 👉 Import your tokenizer & predictor
-const { predict_naive_bayes, tokenize } = require('../algorithm/naiveBayes');
-
+const { predict_naive_bayes, tokenize } = require('../algorithm/naiveBayes')
 // 👉 Import your models
-const restaurantModel = require('../models/restaurant-model');
-const reviewModel = require('../models/review-model');
+const restaurantModel = require('../src/models/restaurant.model');
+const reviewModel = require('../src/models/review.model');
 
 // ✅ Update this to your own MongoDB URI
 const MONGO_URI = 'mongodb+srv://admin:admin@cluster0.chhhzzl.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0';

@@ -5,8 +5,6 @@ module.exports = function (req, res, next) {
       next();
       return;
     }
-    
-    res.clearCookie('token');
     res.redirect("/");
   } catch (err) {
     console.log(err.message);

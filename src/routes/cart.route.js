@@ -5,6 +5,7 @@ const router = express.Router();
 const userModel = require('../models/user.model');
 const restaurantModel = require('../models/restaurant.model');
 const mongoose = require('mongoose');
+const { ORDER_STATUS } = require('../config/app.config.js');
 
 router.post('/add', isLoggedin, async (req, res) => {
   const { restaurantId, foodname } = req.body;
@@ -107,7 +108,8 @@ router.get('/checkout', isLoggedin, async (req, res) => {
 
 router.post('/checkout', isLoggedin, async (req, res) => {
   const { instructions } = req.body;
-  const user = await userModel.findById(req.user.id).populate('cart.restaurant');
+  const user = await userModel.findById(req.user._id).populate('cart.restaurant');
+  console.log("User cart:", user);
 
   if (!user || user.cart.length === 0) {
     req.flash('error', 'Your cart is empty.');
@@ -122,8 +124,7 @@ router.post('/checkout', isLoggedin, async (req, res) => {
     })),
     totalPrice: user.cart.reduce((acc, item) => acc + item.food.price * item.quantity, 0),
     paymentMethod: 'Cash on Delivery',
-    status:'completed',
-    
+    status:ORDER_STATUS.COMPLETED,
     instructions,
     orderedAt: new Date(),
   };

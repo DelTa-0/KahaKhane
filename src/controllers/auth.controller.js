@@ -81,7 +81,7 @@ module.exports.loginUser = async function (req, res) {
         let token = jwt.sign(
           { email: user.email, id: user._id },
           "secret_key",
-          { expiresIn: "1h" }
+          { expiresIn: "30m" }
         );
         res.cookie("token", token);
         req.flash("success_msg", "You have successfully logged in!!");
@@ -99,7 +99,7 @@ module.exports.loginUser = async function (req, res) {
 };
 
 module.exports.logout = function (req, res) {
-  // res.cookie("token", "");
+  res.cookie("token", "");
   res.redirect("/login");
 };
 

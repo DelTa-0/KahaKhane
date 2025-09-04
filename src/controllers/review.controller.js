@@ -3,15 +3,21 @@ const { tokenize, predict_naive_bayes } = require('../../algorithm/naiveBayes');
 const reviewModel = require('../models/review.model');
 const userModel = require('../models/user.model');
 
-module.exports.getReviews=async function (req,res){
-    try {
-        const review = await reviewModel.find({});
-        res.json(review);
-      } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Failed to fetch reviews' });
-      }
-    }
+
+module.exports.getReviews=async (req, res) => {
+  const { restaurantId, foodName } = req.params;
+  const { review, rating } = req.body;
+
+  await reviewModel.create({
+    restaurantId,
+    foodName,
+    review,
+    sentiment_score: parseFloat(rating), // or run sentiment analysis
+    userId: req.user._id
+  });
+
+  res.redirect('/users/profile');
+};
 
 module.exports.addReview = async function (req,res){
   try {

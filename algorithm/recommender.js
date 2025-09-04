@@ -126,8 +126,25 @@ function buildRecommendations({ restaurants, user, reviews }) {
     if (!restIdStr || !reviewText) return; // skip if invalid
 
     const cleanedReview = tokenize(reviewText);
-    const sentimentScore = predict_naive_bayes(cleanedReview); // returns 0–1
-
+    // Use granular sentiment: log-probabilities from Naive Bayes
+    // predict_naive_bayes_granular should return { logProb0, logProb1 }
+    let sentimentDetail;
+    if (typeof predict_naive_bayes === 'function' && predict_naive_bayes.length > 1) {
+      // If the function supports granular output
+      sentimentDetail = predict_naive_bayes(cleanedReview, true); // true = granular
+    } else {
+      // Fallback: binary
+      sentimentDetail = { logProb0: predict_naive_bayes(cleanedReview) === 0 ? 0 : -1, logProb1: predict_naive_bayes(cleanedReview) === 1 ? 0 : -1 };
+    }
+    // Normalize log-probabilities to [0,1]
+    let sentimentScore = 0.5;
+    if (sentimentDetail && typeof sentimentDetail.logProb0 === 'number' && typeof sentimentDetail.logProb1 === 'number') {
+      const maxLog = Math.max(sentimentDetail.logProb0, sentimentDetail.logProb1);
+      const exp0 = Math.exp(sentimentDetail.logProb0 - maxLog);
+      const exp1 = Math.exp(sentimentDetail.logProb1 - maxLog);
+      const sumExp = exp0 + exp1;
+      sentimentScore = exp1 / sumExp; // probability of positive
+    }
     if (!sentimentMap[restIdStr]) sentimentMap[restIdStr] = [];
     sentimentMap[restIdStr].push(sentimentScore);
   });
@@ -149,8 +166,7 @@ function buildRecommendations({ restaurants, user, reviews }) {
       sentimentScore = arr.reduce((a, b) => a + b, 0) / arr.length;
     }
 
-    // Popularity score
-    const popularityScore = r.popularity || 0;
+    
 
     // Distance
     let distanceScore = 0;
@@ -164,7 +180,6 @@ function buildRecommendations({ restaurants, user, reviews }) {
       restaurant: r,
       contentScore,
       sentimentScore,
-      popularityScore,
       distanceKm: distanceScore
     };
   });
@@ -177,14 +192,12 @@ function buildRecommendations({ restaurants, user, reviews }) {
     s.distancePenalty = maxDist > 0 ? s.distanceKm / maxDist : 0;
   });
 
-  const α = 0.1; // content
-  const β = 0.1; // popularity
-  const γ = 0.3; // sentiment
-  const δ = 0.5; // distance penalty
+  const α = 0.3; // content
+  const γ = 0.4; // sentiment
+  const δ = 0.3; // distance penalty
   scored.forEach(s => {
     s.finalScore =
       α * s.contentScore +
-      β * s.popularityScore +
       γ * s.sentimentScore -
       δ * s.distancePenalty;
   });

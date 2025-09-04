@@ -1,6 +1,7 @@
 module.exports = function (req, res, next) {
   try {
     const user = req.user;
+    console.log("Guest middleware:", user);
     if (!user) {
       next();
       return;

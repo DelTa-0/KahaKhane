@@ -25,9 +25,10 @@ const appendUserToRequest = async (req, res, next) => {
     console.error('Error in appendUserToRequest middleware:', error);
 
     if (error.name === 'TokenExpiredError') {
-    return res.redirect('/login');
-  
-}
+      req.flash("error_msg", "Session expired, please login again!");
+      res.cookie('token', '');
+      return res.redirect('/login');
+    }
     return res.status(401).json({ message: 'Invalid token.' });
   }
 };

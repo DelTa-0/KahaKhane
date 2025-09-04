@@ -13,6 +13,7 @@ module.exports = function (req, res, next) {
   const user = req.user;
   if (!user) {
     req.flash("error_msg", "Please login to access this page!");
+    res.cookie("token", "");
     return res.redirect("/login");
   }
 

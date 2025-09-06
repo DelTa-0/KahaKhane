@@ -1,22 +1,10 @@
 // recommender.js
 
-// ✅ Import Naive Bayes predictor and tokenizer
-const { predict_naive_bayes, tokenize } = require('./naiveBayes');
+// -------------------------
+// ✅ Helper Functions
+// -------------------------
 
-// -------------------------
-// ✅ Build documents for TF-IDF
-// -------------------------
-function buildDocuments(restaurants) {
-  return restaurants.map(r => {
-    const menuNames = (r.menu || []).map(item => item.name).join(' ');
-    const combined = `${r.name || ''} ${r.address || ''} ${menuNames}`;
-    return tokenize(combined);
-  });
-}
-
-// -------------------------
-// ✅ TF-IDF computation
-// -------------------------
+// Compute TF-IDF vectors for a list of tokenized documents
 function computeTFIDF(docs) {
   const vocab = new Set();
   docs.forEach(doc => doc.forEach(term => vocab.add(term)));
@@ -47,13 +35,9 @@ function computeTFIDF(docs) {
   return { vectors, vocabList };
 }
 
-// -------------------------
-// ✅ Cosine Similarity
-// -------------------------
+// Cosine similarity between two vectors
 function cosineSimilarity(vecA, vecB) {
-  let dot = 0,
-    magA = 0,
-    magB = 0;
+  let dot = 0, magA = 0, magB = 0;
   for (let i = 0; i < vecA.length; i++) {
     dot += vecA[i] * vecB[i];
     magA += vecA[i] * vecA[i];
@@ -63,12 +47,10 @@ function cosineSimilarity(vecA, vecB) {
   return dot / (Math.sqrt(magA) * Math.sqrt(magB));
 }
 
-// -------------------------
-// ✅ Haversine distance (in km)
-// -------------------------
+// Haversine distance between two coordinates [lng, lat]
 function haversineDistance(coord1, coord2) {
   const toRad = deg => (deg * Math.PI) / 180;
-  const R = 6371; // Earth radius in km
+  const R = 6371; // km
   const dLat = toRad(coord2[1] - coord1[1]);
   const dLon = toRad(coord2[0] - coord1[0]);
   const lat1 = toRad(coord1[1]);
@@ -85,9 +67,12 @@ function haversineDistance(coord1, coord2) {
 // ✅ Main Recommendation Function
 // -------------------------
 function buildRecommendations({ restaurants, user, reviews }) {
-  // Build docs and TF-IDF
-  const docs = buildDocuments(restaurants);
-  const { vectors } = computeTFIDF(docs);
+  // Build docs and TF-IDF (content-based similarity)
+  const docs = restaurants.map(r => {
+    const menuNames = (r.menu || []).map(item => item.name).join(" ");
+    return `${r.name || ""} ${r.address || ""} ${menuNames}`.toLowerCase();
+  });
+  const { vectors } = computeTFIDF(docs.map(d => d.split(/\s+/)));
 
   // Build profile vector from user's past orders
   const orderedRestaurantIds = new Set();
@@ -100,7 +85,7 @@ function buildRecommendations({ restaurants, user, reviews }) {
   let profileVector = new Array(vectors[0]?.length || 0).fill(0);
   const orderedIndexes = restaurants
     .map((r, idx) =>
-      orderedRestaurantIds.has(String(r.restaurantId)) ? idx : -1
+      orderedRestaurantIds.has(String(r._id)) ? idx : -1
     )
     .filter(idx => idx >= 0);
 
@@ -115,58 +100,32 @@ function buildRecommendations({ restaurants, user, reviews }) {
   }
 
   // -------------------------
-  // ✅ Build sentiment map from reviews using Naive Bayes
+  // ✅ Sentiment from DB (already scored at review submission)
   // -------------------------
   const sentimentMap = {};
   (reviews || []).forEach(rv => {
-    // Convert ObjectIds to string for matching
     const restIdStr = rv.restaurantId ? String(rv.restaurantId) : null;
-    const reviewText = rv.review || rv.reviewText || rv.text || '';
-
-    if (!restIdStr || !reviewText) return; // skip if invalid
-
-    const cleanedReview = tokenize(reviewText);
-    // Use granular sentiment: log-probabilities from Naive Bayes
-    // predict_naive_bayes_granular should return { logProb0, logProb1 }
-    let sentimentDetail;
-    if (typeof predict_naive_bayes === 'function' && predict_naive_bayes.length > 1) {
-      // If the function supports granular output
-      sentimentDetail = predict_naive_bayes(cleanedReview, true); // true = granular
-    } else {
-      // Fallback: binary
-      sentimentDetail = { logProb0: predict_naive_bayes(cleanedReview) === 0 ? 0 : -1, logProb1: predict_naive_bayes(cleanedReview) === 1 ? 0 : -1 };
-    }
-    // Normalize log-probabilities to [0,1]
-    let sentimentScore = 0.5;
-    if (sentimentDetail && typeof sentimentDetail.logProb0 === 'number' && typeof sentimentDetail.logProb1 === 'number') {
-      const maxLog = Math.max(sentimentDetail.logProb0, sentimentDetail.logProb1);
-      const exp0 = Math.exp(sentimentDetail.logProb0 - maxLog);
-      const exp1 = Math.exp(sentimentDetail.logProb1 - maxLog);
-      const sumExp = exp0 + exp1;
-      sentimentScore = exp1 / sumExp; // probability of positive
-    }
+    if (!restIdStr || rv.sentimentScore == null) return;
     if (!sentimentMap[restIdStr]) sentimentMap[restIdStr] = [];
-    sentimentMap[restIdStr].push(sentimentScore);
+    sentimentMap[restIdStr].push(rv.sentimentScore);
   });
 
   // -------------------------
   // ✅ Compute scores for each restaurant
   // -------------------------
   const scored = restaurants.map((r, idx) => {
-    // use _id (ObjectId) for sentiment map match
     const id = r._id ? String(r._id) : null;
 
+    // Content similarity (profile vs restaurant TF-IDF)
     const contentScore =
       profileVector.length > 0 ? cosineSimilarity(profileVector, vectors[idx]) : 0;
 
-    // Average sentiment score
+    // Average sentiment score from DB
     let sentimentScore = 0;
     if (id && sentimentMap[id]) {
       const arr = sentimentMap[id];
       sentimentScore = arr.reduce((a, b) => a + b, 0) / arr.length;
     }
-
-    
 
     // Distance
     let distanceScore = 0;
@@ -192,9 +151,9 @@ function buildRecommendations({ restaurants, user, reviews }) {
     s.distancePenalty = maxDist > 0 ? s.distanceKm / maxDist : 0;
   });
 
-  const α = 0.3; // content
-  const γ = 0.4; // sentiment
-  const δ = 0.3; // distance penalty
+  const α = 0.3; // weight: content
+  const γ = 0.4; // weight: sentiment
+  const δ = 0.3; // weight: distance penalty
   scored.forEach(s => {
     s.finalScore =
       α * s.contentScore +
@@ -208,12 +167,4 @@ function buildRecommendations({ restaurants, user, reviews }) {
   return scored;
 }
 
-// -------------------------
-// ✅ Export
-// -------------------------
-module.exports = {
-  buildRecommendations,
-  computeTFIDF,
-  cosineSimilarity,
-  haversineDistance
-};
+module.exports = { buildRecommendations };

@@ -1,6 +1,6 @@
 const restaurantModel = require("../models/restaurant.model");
 const reviewModel = require("../models/review.model");
-const { buildRecommendations } = require("../../algorithm/recommender"); // Import the recommender
+const { buildRecommendations } = require("../algorithm/recommender"); // Import the recommender
 
 const geocode = require("../utils/geocode");
 

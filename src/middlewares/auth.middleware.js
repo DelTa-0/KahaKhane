@@ -10,10 +10,9 @@ const userModel = require("../models/user.model");
  */
 
 module.exports = function (req, res, next) {
-  const user = req.user;
+  const user = req.user || null;
   if (!user) {
     req.flash("error_msg", "Please login to access this page!");
-    res.cookie("token", "");
     return res.redirect("/login");
   }
 

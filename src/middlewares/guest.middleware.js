@@ -1,16 +1,14 @@
+
 module.exports = function (req, res, next) {
   try {
-    const user = req.user;
-    console.log(user)
-    console.log("Guest middleware:", user);
+    const user = req.user
     if (!user) {
-      next();
-      return;
+      return next();
     }
-    res.redirect("/");
+    return res.redirect("/login");
   } catch (err) {
-    console.log(err.message);
-    req.flash("error_msg", "something went wrong");
-    res.redirect("/");
+    console.error("Guest middleware error:", err.message);
+    req.flash("error_msg", "Something went wrong");
+    return res.redirect("/");
   }
 };

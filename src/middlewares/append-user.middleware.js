@@ -8,28 +8,40 @@ const { APP_CONFIG } = require('../config/app.config');
 const appendUserToRequest = async (req, res, next) => {
   try {
     const token = req.cookies.token;
-    
-    if (token) {
-      const decoded = jwt.verify(token, APP_CONFIG.JWT_KEY);
 
-      const user = await UserModel.findOne({ email: decoded.email }).select('-password');
-      if (!user) {
-        req.flash('error_msg', 'User not found');
-        return res.redirect('/');
-      }
-
-      req.user = user;
+    if (!token) {
+      req.user = null; // no token, user is guest
+      return next();
     }
+
+    const decoded = jwt.verify(token, APP_CONFIG.JWT_KEY);
+
+    const user = await UserModel.findOne({ email: decoded.email }).select('-password');
+    if (!user) {
+      req.user = null;
+      req.flash('error_msg', 'User not found');
+      res.cookie('token', '');
+      return res.redirect('/login');
+    }
+
+    req.user = user; // attach user
     next();
+
   } catch (error) {
     console.error('Error in appendUserToRequest middleware:', error);
+
+    req.user = null; // fallback as guest
 
     if (error.name === 'TokenExpiredError') {
       req.flash("error_msg", "Session expired, please login again!");
       res.cookie('token', '');
       return res.redirect('/login');
     }
-    return res.status(401).json({ message: 'Invalid token.' });
+
+    // fallback for invalid token or other errors
+    req.flash("error_msg", "Invalid session, please login again!");
+    res.cookie('token', '');
+    return res.redirect('/login');
   }
 };
 

@@ -22,6 +22,7 @@ module.exports.getIndexPage = function (req, res) {
 
 module.exports.registerUser = async function (req, res) {
   try {
+    console.log("token",req.cookies.token);
     let { email, password, fullname } = req.body;
     let user = await userModel.findOne({ email: email });
     if (user) {

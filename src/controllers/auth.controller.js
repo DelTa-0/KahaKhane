@@ -22,36 +22,34 @@ module.exports.getIndexPage = function (req, res) {
 
 module.exports.registerUser = async function (req, res) {
   try {
-    console.log("token",req.cookies.token);
     let { email, password, fullname } = req.body;
     let user = await userModel.findOne({ email: email });
     if (user) {
-      // make response as json formatted not string
       req.flash("error_msg", "You already have an account");
-      return res.redirect("/");
+      return res.redirect("/login");
     }
 
-    // use async await
-    // use service for this business operation
-    // dont keep everything inside controller
-    // controller is meant just to keep communication between business logic and views - service - views
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(password, salt, async (err, hash) => {
-        if (err) return res.send(err.message);
-        else {
-          let user = await userModel.create({
-            email,
-            password: hash,
-            fullname,
-          });
-
-          req.flash("success_msg", "user created successfully");
-          return res.redirect("/");
-        }
-      });
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    let newUser = await userModel.create({
+      email,
+      password: hash,
+      fullname,
     });
+
+    // // Set JWT token after registration (use same secret as in login)
+    // let token = jwt.sign(
+    //   { email: newUser.email, id: newUser._id },
+    //   "secret_key",
+    //   { expiresIn: "30m" }
+    // );
+    // res.cookie("token", token);
+    req.flash("success_msg", "User created successfully. Please login.");
+    return res.redirect("/login");
   } catch (err) {
     console.log(err.message);
+    req.flash("error_msg", "Registration failed. Please try again.");
+    return res.redirect("/register");
   }
 };
 

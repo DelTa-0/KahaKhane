@@ -1,6 +1,6 @@
 const reviewModel = require('../models/review.model');
 const userModel = require('../models/user.model');
-const { getSentimentScore } = require('../algorithm/sentimentClient'); // ✅ import
+const { getSentimentScore } = require('../utils/sentimentClient');
 
 module.exports.getReviews = async (req, res) => {
   const { restaurantId, foodName } = req.params;

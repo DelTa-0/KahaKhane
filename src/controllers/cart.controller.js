@@ -105,8 +105,6 @@ module.exports.getCheckoutPage = async (req, res) => {
 module.exports.postCheckout=async (req, res) => {
   const { instructions } = req.body;
   const user = await userModel.findById(req.user._id).populate('cart.restaurant');
-  console.log("User cart:", user);
-
   if (!user || user.cart.length === 0) {
     req.flash('error', 'Your cart is empty.');
     return res.redirect('/cart');

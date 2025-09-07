@@ -79,7 +79,7 @@ module.exports.loginUser = async function (req, res) {
       if (result) {
         let token = jwt.sign(
           { email: user.email, id: user._id },
-          "secret_key",
+          process.env.JWT_KEY,
           { expiresIn: "30m" }
         );
         res.cookie("token", token);

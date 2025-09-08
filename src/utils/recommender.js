@@ -1,9 +1,5 @@
-// recommender.js
-
-// -------------------------
-// ✅ Helper Functions
-// -------------------------
-
+// src/utils/recommender.js
+// Recommendation engine for restaurants based on content, sentiment, and distance
 // Compute TF-IDF vectors for a list of tokenized documents
 function computeTFIDF(docs) {
   const vocab = new Set();

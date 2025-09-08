@@ -1,4 +1,5 @@
 // sentimentClient.js
+// Client for sentiment analysis API with batching and caching
 const axios = require("axios");
 
 const SENTIMENT_API = process.env.SENTIMENT_API_URL || "http://localhost:8000";

@@ -7,19 +7,14 @@
 function computeTFIDF(docs) {
   const vocab = new Set();
   docs.forEach(doc => doc.forEach(term => vocab.add(term)));
-
-  // ✅ Sort vocab so TF-IDF is deterministic across browsers
   const vocabList = Array.from(vocab).sort();
-
   const docCount = docs.length;
   const docFreq = {};
   vocabList.forEach(t => (docFreq[t] = 0));
-
   docs.forEach(doc => {
     const seen = new Set(doc);
     seen.forEach(t => docFreq[t]++);
   });
-
   const idf = {};
   vocabList.forEach(t => {
     idf[t] = Math.log(docCount / (1 + docFreq[t]));
@@ -82,11 +77,9 @@ function buildQueryVector(query, vocabList, idf) {
   });
 }
 
-// -------------------------
-// ✅ Main Recommendation Function
-// -------------------------
+
+// Main Recommendation Function
 function buildRecommendations({ restaurants, user, reviews, query }) {
-  // Build docs and TF-IDF (content-based similarity)
   const docs = restaurants.map(r => {
     const menuNames = (r.menu || []).map(item => item.name).join(" ");
     return `${r.name || ""} ${r.address || ""} ${menuNames}`.toLowerCase();
@@ -186,16 +179,16 @@ function buildRecommendations({ restaurants, user, reviews, query }) {
   });
 
   // Weighted scoring
-  const α = 0.15; // weight: content
-  const β = 0.25; // weight: query relevance
-  const γ = 0.35; // weight: sentiment
-  const δ = 0.25; // weight: distance penalty
+  const alpha = 0.15; // weight: content
+  const beta = 0.25; // weight: query relevance
+  const gamma = 0.25; // weight: sentiment
+  const delta = 0.35; // weight: distance penalty
   scored.forEach(s => {
     s.finalScore =
-      α * s.contentScore +
-      β * s.queryScore +
-      γ * s.sentimentScore -
-      δ * s.distancePenalty;
+      alpha * s.contentScore +
+      beta * s.queryScore +
+      gamma * s.sentimentScore -
+      delta * s.distancePenalty;
   });
 
   // Sort by final score

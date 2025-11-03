@@ -28,7 +28,14 @@ module.exports.registerUser = async function (req, res) {
       req.flash("error_msg", "You already have an account");
       return res.redirect("/login");
     }
-
+    if (!email || !password || !fullname) {
+      req.flash("error_msg", "All fields are required");
+      return res.redirect("/login");
+    }
+    if (password.length < 8) {
+      req.flash("error_msg", "Password must be at least 8 characters");
+      return res.redirect("/login");
+    }
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
     let newUser = await userModel.create({
